@@ -14,27 +14,27 @@ liff.init({
             let line_uid = profile.userId;
             let displayName = profile.displayName;
             let pictureUrl = profile.pictureUrl;
-            let data = {
-                'action': '報到頁面',
-                'line_group_uid': line_group_uid,
-                'line_uid': line_uid,
-                'line_displayName': displayName,
-                'line_pictureUrl': pictureUrl
-            };
-            console.log(data);
+            // let data = {
+            //     'action': '報到頁面',
+            //     'line_group_uid': line_group_uid,
+            //     'line_uid': line_uid,
+            //     'line_displayName': displayName,
+            //     'line_pictureUrl': pictureUrl
+            // };
+            // console.log(data);
             let form = document.createElement('form');
-            form.method = 'post';
-            form.action = 'https://script.google.com/macros/s/AKfycbyLvm06rl6mbsNmsiExfY_gcu--yjMcQjiY2wTuOSlDuU1lIqT_vut6aedceJcZqx9DwA/exec';
+            form.method = 'get';
+            form.action = 'https://script.google.com/macros/s/AKfycbxmBuVCa__tKsoo7qWMJgn2y7HFuaxnRq5J4MgWgXyJwXcsosiErbgW_wbvY1_6UVmj5Q/exec';
             document.body.appendChild(form);
     
-            for (const key in data) {
-                const formField = document.createElement('input');
-                formField.type = 'hidden';
-                formField.name = key;
-                formField.value = data[key];
+            // for (const key in data) {
+            //     const formField = document.createElement('input');
+            //     formField.type = 'hidden';
+            //     formField.name = key;
+            //     formField.value = data[key];
     
-                form.appendChild(formField);
-            }
+            //     form.appendChild(formField);
+            // }
             form.submit();
         })
         .catch((err) => {
