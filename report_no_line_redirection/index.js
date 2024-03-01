@@ -1,6 +1,6 @@
 
 let form = document.createElement('form');
 form.method = 'get';
-form.action = 'https://script.google.com/macros/s/AKfycbxHmUtiDpm8oPrxgMGrxBqhWtHM0Q8HtJSaXV4V52sJAbMifNNbeIj4V7kLp1TITyNUPw/exec';
+form.action = 'https://script.google.com/macros/s/AKfycbylma5LUrOK72RNFSdoixpnhN6w6Wm6y1N18dYANuMU7FT7reDB3TARXXvUkV6Vmq8c0Q/exec';
 document.body.appendChild(form);
 form.submit();
