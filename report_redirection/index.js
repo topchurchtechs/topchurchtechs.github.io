@@ -25,7 +25,7 @@ liff.init({
             console.log(data);
             let form = document.createElement('form');
             form.method = 'post';
-            form.action = 'https://script.google.com/macros/s/AKfycbylma5LUrOK72RNFSdoixpnhN6w6Wm6y1N18dYANuMU7FT7reDB3TARXXvUkV6Vmq8c0Q/exec';
+            form.action = 'https://script.google.com/macros/s/AKfycbwGVQ5dV9DlLWm3TIBgKfkRq6DyLYQX-nvoQ4Rvktze8EqHYDEfrGc9_icvrEvQOPioew/exec';
             document.body.appendChild(form);
     
             for (const key in data) {
