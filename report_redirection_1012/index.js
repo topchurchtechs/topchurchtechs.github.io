@@ -1,5 +1,5 @@
 liff.init({
-    'liffId':  '1657754998-0GN7L1kO',
+    'liffId':  '1657754998-4eBgj0Wk',
 }).then(function() {
     // 這邊開始寫使用其他功能
     const context = liff.getContext();
