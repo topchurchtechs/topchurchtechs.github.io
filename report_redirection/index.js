@@ -19,9 +19,12 @@ liff.init({
                 "https://script.google.com/macros/s/AKfycbzPddk7ptO-QZraJO1DCVJIVyrwjrJOOGvIs8XQOHTSLIhkNRk_5MTI5IGY8y_lK5wEvA/exec",
                 "https://script.google.com/macros/s/AKfycbz-cAVoq4PLQ9ia20tL4duh6zV99IKAcunwVaPpXS8L0HXt_mKTicb1pvUO4S55OBr3wQ/exec",
                 "https://script.google.com/macros/s/AKfycbzpb6ofVmfnTJdWcX-Yoh6RZYwTcDYoSqL5m3yIjlKuof1QjbPrpgbdGOQo_ACTojSKEA/exec",
-                "https://script.google.com/macros/s/AKfycbyq0xmKfc43NdzZgc8JGa0YJQ45QzGJllFALFQyI2VlBrWNdPuhMCcLEU5tMHiNj_5AdQ/exec"
+                "https://script.google.com/macros/s/AKfycbx2YR4LxMG9qb8KpHKnKv6Wawtxup7KGl0f63gY6-Cgz68OhaEri3hnRy8uLFcXZzmriw/exec",
+                "https://script.google.com/macros/s/AKfycbwcbu3NYj8dnWmvmb_m_XiP0Dzd1Ak0Oh_zcR88Po2C9paxsRVTRDD0MphRkMJF3_fl/exec",
+                "https://script.google.com/macros/s/AKfycbwYo80cfKatqLg8zz_2ozJYygqsNM8fpbhXVnmjraDrE19aMl6AMzRwgwDhrU61p4qv/exec",
+                "https://script.google.com/macros/s/AKfycbxktTqxYH3yCE8rgdpjXRn2QV2VdlrsGrgNei_p8Lo61r_owynzt2arcTJf6LKJp48S9w/exec"
             ];
-            let r = Math.floor(Math.random() * 9);
+            let r = Math.floor(Math.random() * 12);
 
             let line_group_uid = context.groupId;
             let line_uid = profile.userId;
