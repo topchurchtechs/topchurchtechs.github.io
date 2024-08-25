@@ -22,10 +22,12 @@ function googleForm() { //這裡要對應到自己的 javascript 名稱
             0: function() {
                 alert(`${field1} ${field2} 成功報到!`); //完成送出表單的警告視窗
                 window.location.assign(`https://topchurchtechs.github.io/topchurch_report_result?sid=${field1}&sname=${field2}`); //送出表單後的導向
+                // window.location.assign(`http://127.0.0.1:5500/topchurch_report_result?sid=${field1}&sname=${field2}`); //送出表單後的導向
             },
             200: function() {
                 alert(`${field1} ${field2} 成功報到!`); //完成送出表單的警告視窗
                 window.location.assign(`https://topchurchtechs.github.io/topchurch_report_result?sid=${field1}&sname=${field2}`); //送出表單後的導向
+                // window.location.assign(`http://127.0.0.1:5500/topchurch_report_result?sid=${field1}&sname=${field2}`); //送出表單後的導向
             }
         }
     });

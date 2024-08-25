@@ -3,5 +3,5 @@ const URLParams = new URLSearchParams(window.location.search);
 
 var sid = URLParams.get('sid');
 var sname = URLParams.get('sname');
-$("[id='sid']").val(sid);
-$("[id='sname']").val(sname);
+$('#sid').text(sid);
+$('#sname').text(sname);
