@@ -1,3 +1,9 @@
+// 啟動掃描器
+const URLParams = new URLSearchParams(window.location.search);
+
+var class_number = URLParams.get('class_number');
+$("[name='ClassNumber']").val(class_number);
+
 function googleForm() { //這裡要對應到自己的 javascript 名稱
     //宣告欄位
     var field1 = $("[name='SID']").val();
@@ -14,12 +20,12 @@ function googleForm() { //這裡要對應到自己的 javascript 名稱
         dataType: "xml",
         statusCode: {
             0: function() {
-                alert("已送出!"); //完成送出表單的警告視窗
-                // window.location.assign("http://google.com"); //送出表單後的導向
+                alert("成功報到!"); //完成送出表單的警告視窗
+                window.location.assign("http://google.com"); //送出表單後的導向
             },
             200: function() {
                 alert("已送出!"); //完成送出表單的警告視窗
-                // window.location.assign("http://google.com"); //送出表單後的導向
+                window.location.assign("http://google.com"); //送出表單後的導向
             }
         }
     });
@@ -44,5 +50,4 @@ let html5QrcodeScanner = new Html5QrcodeScanner(
     "reader", { fps: 10, qrbox: 250 }
 );
 
-// 啟動掃描器
 html5QrcodeScanner.render(onScanSuccess, onScanFailure);
