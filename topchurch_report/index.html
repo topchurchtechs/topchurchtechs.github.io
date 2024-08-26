@@ -1,26 +1,42 @@
 <!DOCTYPE html>
 <html>
 
-  <head>
-    <base target="_top">
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-    <title>topchurch_report</title>
-    <link rel="stylesheet" type="text/css" href="index.css">
-  </head>
+<head>
+  <base target="_top">
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+  <title>topchurch_report</title>
+  <link rel="stylesheet" type="text/css" href="index.css">
+</head>
 
-  <body>
-    <form action="javascript:googleForm();">
-      <fieldset>
-        <legend>報到</legend>
-        <label>編號</label><input type="text" name="sid">
-        <label>姓名</label><input type="text" name="sname">
-        <label>課堂</label><input type="text" name="class_number">
-        <input type="submit" value="送出">
-      </fieldset>
-    </form>
-    <div id="reader" style="width:500px;height:500px;"></div>
-    <script type="text/javascript" src="index.js"></script>
-  </body>
+<body>
+  <div id="container">
+    <div id="title_container">
+      <h1>末世論</h1>
+    </div>
+    <div id="form_container">
+      <form id="google_form" action="javascript:googleForm();">
+        <fieldset id="google_form_fieldset">
+          <div class="filed_group">
+            <label for="sid">編號</label><input type="text" id="sid_input" name="sid">
+          </div>
+          <div class="filed_group">
+            <label for="sname">姓名</label><input type="text" id="sname_input" name="sname">
+          </div>
+          <div class="filed_group">
+            <label for="class_number">課堂</label><input type="text" id="class_number_input" name="class_number">
+          </div>
+          <div class="submit_filed_group">
+            <input type="submit" value="送出">
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <div id="reader_container">
+      <div id="reader"></div>
+    </div>
+  </div>
+  <script type="text/javascript" src="index.js"></script>
+</body>
 
 </html>

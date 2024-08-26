@@ -1,9 +1,3 @@
-// 啟動掃描器
-const URLParams = new URLSearchParams(window.location.search);
-
-var class_number = URLParams.get('class_number');
-$("[name='class_number']").val(class_number);
-
 function googleForm() { //這裡要對應到自己的 javascript 名稱
     //宣告欄位
     var field1 = $("[name='sid']").val();
@@ -46,9 +40,22 @@ function onScanFailure(error) {
     console.warn(`QR code scan failed: ${error}`);
 }
 
-// 創建Html5QrcodeScanner物件
-let html5QrcodeScanner = new Html5QrcodeScanner(
-    "reader", { fps: 10, qrbox: 250 }
-);
+function init() {
+    // 啟動掃描器
+    const URLParams = new URLSearchParams(window.location.search);
 
-html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    var class_number = URLParams.get('class_number');
+    $("[name='class_number']").val(class_number);
+    // 創建Html5QrcodeScanner物件
+    const readerElement = document.getElementById("reader");
+    const width = readerElement.clientWidth;
+    const height = readerElement.clientHeight;
+    const minDimension = Math.min(width, height);
+    let html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", { fps: 10, qrbox: Math.floor(minDimension * 0.8) } // qrbox 的大小是長寬最小值的 50%
+    );
+    
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+}
+
+init();
