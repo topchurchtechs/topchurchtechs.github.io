@@ -8,12 +8,21 @@
     <link rel="stylesheet" type="text/css" href="index.css">
   </head>
 
-  <body>
-    <label>恭喜</label>
-    <label id="sid"></label>
-    <label id="sname"></label>
-    <label>完成第一堂課程!</label>
-    <script type="text/javascript" src="index.js"></script>
-  </body>
-
-</html>
+<body>
+  <div class="container">
+      <div class="message-box">
+          <h1 class="congratulations">恭喜</h1>
+          <div class="info">
+              <p id="sid" class="info-item">編號: </p>
+              <p id="sname" class="info-item">姓名: </p>
+          </div>
+          <div class="course-completion">
+            <p class="completion-message">完成</p>
+            <p id="class_number" class="info-item">課程: </p>
+            <p class="completion-message">課程</p>
+        </div>
+      </div>
+  </div>
+  <img src="./img/quote.png" class="overlay" alt="Overlay Image">
+  <script type="text/javascript" src="index.js"></script>
+</body>
