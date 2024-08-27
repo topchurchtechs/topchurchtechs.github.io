@@ -1,6 +1,7 @@
 const URLParams = new URLSearchParams(window.location.search);
 var key = "0";
 var html5QrcodeScanner;
+var html5QrCode;
 
 function googleForm() { //這裡要對應到自己的 javascript 名稱
     //宣告欄位
@@ -36,18 +37,16 @@ function googleForm() { //這裡要對應到自己的 javascript 名稱
         dataType: "xml",
         statusCode: {
             0: function() {
-                alert(`${field1} ${field2} 成功報到!`); //完成送出表單的警告視窗
+                alert(`${field1} ${field2} 報到成功!`); //完成送出表單的警告視窗
                 window.location.assign(`https://topchurchtechs.github.io/topchurch_report_result?sid=${field1}&sname=${field2}&class_number=${field3}`); //送出表
-                html5QrcodeScanner.resume();
-                $("#google_from").css("display", "none"); // Hide the google_from div
-                $("#reader").css("display", "block");     // Show the reader div單後的導向
+                // $("#google_from").css("display", "none"); // Hide the google_from div
+                // $("#reader").css("display", "block");     // Show the reader div單後的導向
             },
             200: function() {
-                alert(`${field1} ${field2} 成功報到!`); //完成送出表單的警告視窗
+                alert(`${field1} ${field2} 報到成功!`); //完成送出表單的警告視窗
                 window.location.assign(`https://topchurchtechs.github.io/topchurch_report_result?sid=${field1}&sname=${field2}&class_number=${field3}`); //送出表
-                html5QrcodeScanner.resume();
-                $("#google_from").css("display", "none"); // Hide the google_from div
-                $("#reader").css("display", "block");     // Show the reader div
+                // $("#google_from").css("display", "none"); // Hide the google_from div
+                // $("#reader").css("display", "block");     // Show the reader div
             }
         }
     });
@@ -63,13 +62,30 @@ function onScanSuccess(decodedText, decodedResult) {
         $("[name='sname']").val(sname);
         $("#google_from").css("display", "block"); // Show the google_from div
         $("#reader").css("display", "none");     // Hide the reader div
-        html5QrcodeScanner.pause();
+        // html5QrcodeScanner.pause();
+        html5QrCode.stop().then((ignore) => {
+            // 停止扫描
+        }).catch((err) => {
+            // 停止失败处理
+        });
     }
 }
 
-function onScanFailure(error) {
-    // 當掃描失敗時，可以在此處處理錯誤
-    // console.warn(`QR code scan failed: ${error}`);
+function startScan() {
+    html5QrCode.start(
+        { facingMode: "environment" },
+        {
+            fps: 10,    // 帧率，控制扫描速度
+            qrbox: 300 // { width: 250, height: 250 }  // 限制要用于扫描的取景器区域
+        },
+        onScanSuccess,
+        (errorMessage) => {
+            // 结果错误处理
+        })
+        .catch((err) => {
+            // 无法扫描时的错误处理
+        }
+    );
 }
 
 function init() {
@@ -79,14 +95,19 @@ function init() {
     if (URLParams.has("key")) {
         key = URLParams.get('key');
     }
-    // 創建Html5QrcodeScanner物件
-    html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", { fps: 10, qrbox: 250 } // qrbox 的大小是長寬最小值的 50%
-    );
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure, { facingMode: "environment" });
+
+    // // 創建Html5QrcodeScanner物件
+    // html5QrcodeScanner = new Html5QrcodeScanner(
+    //     "reader", { fps: 10, qrbox: 250 } // qrbox 的大小是長寬最小值的 50%
+    // );
+    // html5QrcodeScanner.render(onScanSuccess, onScanFailure, { facingMode: "environment" });
+
+    html5QrCode = new Html5Qrcode(/* element id */ "reader");
+    startScan();
 
     $("#cancel_btn").click(function() {
-        html5QrcodeScanner.resume();
+        startScan();
+        // html5QrcodeScanner.resume();
         $("#google_from").css("display", "none"); // Hide the google_from div
         $("#reader").css("display", "block");     // Show the reader div
     });
