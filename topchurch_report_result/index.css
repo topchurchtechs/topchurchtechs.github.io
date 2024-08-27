@@ -1,65 +1,65 @@
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    /* background: linear-gradient(#053B50, #176B87); */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+  /* background: linear-gradient(#053B50, #176B87); */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 body::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url("./img/bg.jpg") no-repeat center center;
-    background-size: cover;
-    z-index: -2; 
-  }
-  body::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(5, 59, 80, 0.8); 
-    z-index: -1; /* 确保颜色层在背景图片上面 */
-  }
-  img.overlay {
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translate(-50%, -50%); 
-    z-index: 0; /* 确保图像在半透明颜色层上面 */
-  }
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("./img/bg.jpg") no-repeat center center;
+  background-size: cover;
+  z-index: -2; 
+}
+body::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(5, 59, 80, 0.8); 
+  z-index: -1; /* 确保颜色层在背景图片上面 */
+}
+img.overlay {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  z-index: 0; /* 确保图像在半透明颜色层上面 */
+}
 
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
 }
 
 .message-box {
-    background-color: rgba(238, 238, 238, 0.95);
-    border: 5px solid #1c6f8b;
-    border-radius: 15px;
-    padding: 20px;
-    text-align: center;
-    max-width: 500px; 
-    width: 100%;
+  background-color: rgba(238, 238, 238, 0.95);
+  border: 5px solid #1c6f8b;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  max-width: 800px; 
+  width: 100%;
 }
 
 /* 标题样式 */
 .congratulations {
-    padding-top: 2em;
-    font-size: 40px;
+    padding-top: 1em;
+    font-size: 5em;
     color: #053B50;
     margin-bottom: 15px;
     margin-top: 0;
@@ -71,7 +71,7 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 40px;
+    font-size: 7em;
 }
 
 .info-item {
@@ -84,9 +84,9 @@ body::before {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 40px; 
+    font-size: 5em;
     padding-top: 15px;
-    padding-bottom: 2em;
+    padding-bottom: 1em;
   }
 /* 完成消息样式 */
 .completion-message {
