@@ -209,6 +209,21 @@ input[type="submit"]:active, input[type="button"]:active {
   font-size: 0.5em;
 }
 
+#html5-qrcode-button-camera-permission {
+  font-size: 1em;
+  background: linear-gradient(135deg, #1a7493, #41908b);
+  color: #EEEEEE; 
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: bold; 
+  border: none; 
+  border-radius: 5px; 
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s; 
+  margin: 10px;
+  padding: 12px 25px; 
+  cursor: pointer; 
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+}
+
 #html5-qrcode-button-camera-start {
   font-size: 1em;
   background: linear-gradient(135deg, #1a7493, #41908b);
