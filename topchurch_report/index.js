@@ -1,6 +1,5 @@
 const URLParams = new URLSearchParams(window.location.search);
 var key = "0";
-var html5QrcodeScanner;
 var html5QrCode;
 
 function googleForm() { //這裡要對應到自己的 javascript 名稱
@@ -26,12 +25,12 @@ function googleForm() { //這裡要對應到自己的 javascript 名稱
         return;
     }
     $.ajax({
-        url: "https://docs.google.com/forms/u/0/d/e/1FAIpQLScLR1R1RSU05rsT95PKCn6oLt1Gu40l6F54ut-TG9ptdW0JjQ/formResponse", //Google Form 裡面的 form action 網址 ＊＊記得要填＊＊
+        url: "https://docs.google.com/forms/u/0/d/e/1FAIpQLScPj6vwEM9NOjSbfdT28wIhKTlPHXbfi96shC6k7gXrzWkY7Q/formResponse", //Google Form 裡面的 form action 網址 ＊＊記得要填＊＊
         data: { //Google Form 裡面的欄位 name ＊＊記得要改＊＊
-            "entry.228731780": field1,
-            "entry.354152482": field2,
-            "entry.2082748086": field3,
-            "entry.311567085": field4
+            "entry.1723079018": field1,
+            "entry.1401594143": field2,
+            "entry.396150023": field3,
+            "entry.1436252856": field4
         },
         type: "POST",
         dataType: "xml",
@@ -62,11 +61,11 @@ function onScanSuccess(decodedText, decodedResult) {
         $("[name='sname']").val(sname);
         $("#google_from").css("display", "block"); // Show the google_from div
         $("#reader").css("display", "none");     // Hide the reader div
-        // html5QrcodeScanner.pause();
+        
         html5QrCode.stop().then((ignore) => {
-            // 停止扫描
+            // 停止掃描
         }).catch((err) => {
-            // 停止失败处理
+            // 停止失敗
         });
     }
 }
@@ -95,19 +94,13 @@ function init() {
     if (URLParams.has("key")) {
         key = URLParams.get('key');
     }
-
-    // // 創建Html5QrcodeScanner物件
-    // html5QrcodeScanner = new Html5QrcodeScanner(
-    //     "reader", { fps: 10, qrbox: 250 } // qrbox 的大小是長寬最小值的 50%
-    // );
-    // html5QrcodeScanner.render(onScanSuccess, onScanFailure, { facingMode: "environment" });
+    
 
     html5QrCode = new Html5Qrcode(/* element id */ "reader");
     startScan();
 
     $("#cancel_btn").click(function() {
         startScan();
-        // html5QrcodeScanner.resume();
         $("#google_from").css("display", "none"); // Hide the google_from div
         $("#reader").css("display", "block");     // Show the reader div
     });

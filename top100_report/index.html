@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <base target="_top">
+    <script type="text/javascript" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+    <title>關鍵100人數回報</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+  </head>
+
+  <body>
+    <div id="div_contents">
+      <div id="div_head">
+          <div id="div_head_box">
+              <h1 id="h_title">人數回報</h1>
+              <h1 id="h_date"><?= date ?></h1>
+              <h1 id="h_week">(<?= week ?>)</h1>
+          </div>
+      </div>
+      <div id="div_form">
+          <div id="div_form_box">
+              <div id="div_input_church_box" class="div_input">
+                  <label>教會:</label>
+                  <? if (church) { ?>
+                    <input id="input_church" name="church" readonly="readonly" value=<?= church ?>>
+                  <? } ?>
+                  <? if (church_list) { ?>
+                    <input id="input_church" list="church_list" name="church">
+                    <datalist id="church_list">
+                      <? for (let i = 0; i < church_list.length; i++) { ?>
+                        <option value=<?= church_list[i] ?>>
+                      <? } ?>
+                    </datalist>
+                  <? } ?>
+              </div>
+              <div id="div_input_num_box" class="div_input">
+                  <label>人數:</label>
+                  <input id="input_num" type="number" name="num" oninput="value=value.replace(/-|\./g, '');">
+              </div>
+              <div id="div_input_btn_box">
+                <input id="input_btn_submit" type="button" value="提交" onclick="on_click_btn_submit();">
+              </div>
+          </div>
+      </div>
+    </div>
+    <script type="text/javascript" src="index.js"></script>
+  </body>
+
+</html>

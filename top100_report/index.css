@@ -1,0 +1,168 @@
+@import url(https://fonts.googleapis.com/earlyaccess/cwtexkai.css);
+@import url(https://fonts.googleapis.com/earlyaccess/cwtexyen.css);
+@import url(https://fonts.googleapis.com/earlyaccess/cwtexfangsong.css);
+@import url(https://fonts.googleapis.com/earlyaccess/notosanstc.css);
+@import url(https://fonts.googleapis.com/earlyaccess/cwtexming.css);
+
+body{
+	margin:0px;
+	padding:0px;
+  width: 100%;
+	height: 100vh;
+	display: block;
+  background-image: url('https://drive.google.com/uc?export=view&id=15BVbup4pPCqncpQiMFEJfux9FBnVU3V1');
+  background-size: 100% 100%;
+  justify-content: center; 
+  align-items: center ; 
+} 
+
+#div_contents{
+    max-width: 100%;
+    min-width: 800px;
+  margin-top: 50px;
+    height: 100%;
+	display: flex;
+	flex-direction: column;
+    justify-content: center;
+}
+
+#div_head{
+    flex:1;
+    margin-bottom: 50px;
+	display: flex;
+	flex-direction: column;
+    justify-content: end; 
+    align-items: center ; 
+}
+
+#div_form{
+    flex:1;
+	display: flex;
+	flex-direction: column;
+    justify-content: top; 
+    align-items: center ; 
+}
+
+#div_head_box{
+    margin-left: 30%;
+    margin-right: 30%;
+}
+
+#h_title{
+    flex:1;
+    margin: 0px;
+    font-size: 300%;
+	display: flex;
+	flex-direction: row;
+    justify-content: center; 
+    align-items: center ; 
+}
+
+#h_date{
+    flex:1;
+    margin: 0px;
+    font-size: 1000%;
+    font-style: italic;
+    font-weight: bold;
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+	display: flex;
+	flex-direction: row;
+    justify-content: center; 
+    align-items: center ; 
+}
+
+#h_week{
+    flex:1;
+    margin: 0px;
+    font-size: 300%;
+	display: flex;
+	flex-direction: row;
+    justify-content: end; 
+    align-items: center ; 
+}
+
+#div_form_box{
+    height: 100%;
+    width: 100%;
+    max-width: 500px;
+    min-width: 400px;
+    max-height: 200px;
+    margin-left: 30%;
+    margin-right: 30%;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color: white;
+    border-radius: 15px;
+	display: flex;
+	flex-direction: column;
+    justify-content: center; 
+    align-items: center ; 
+}
+
+.div_input {
+    flex: 2;
+    width: 90%;
+    margin: 1%;
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    background-color:darkgray ;
+    border-radius: 10px;
+	display: flex;
+	flex-direction: row;
+    justify-content: center; 
+    align-items: center ; 
+    background-color: #efefef;
+}
+
+#div_input_btn_box{
+    flex: 1;
+    width: 90%;
+	display: flex;
+	flex-direction: column;
+    justify-content: center; 
+    align-items: flex-end ; 
+}
+
+#input_btn_submit{
+    width: 80px;
+    height: 50px;
+    font-size: 150%;
+    border-color: transparent;
+    border: 0ch;
+    color: white;
+    font-weight: bold;
+    background-color:darkgray ;
+    border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+    justify-content: center; 
+    align-items: center ; 
+}
+
+.div_input > label{
+    width: 20%;
+    height: 100%;
+    font-size: 200%;
+    font-weight: bold;
+	display: flex;
+	flex-direction: row;
+    justify-content: center; 
+    align-items: center ; 
+}
+
+.div_input > input{
+    width:70%;
+    height: 100%;
+    font-size: 200%;
+    background-color: transparent;
+    border-color: transparent;
+    border: 0ch;
+	display: flex;
+	flex-direction: row;
+    justify-content: center; 
+    align-items: center ; 
+}
