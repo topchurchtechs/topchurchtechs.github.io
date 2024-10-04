@@ -40,7 +40,7 @@ img.overlay {
   width: 80%;       /* Resize to 100% of the parent element */
   height: auto;      /* Maintain aspect ratio */
   position: absolute;
-  top: 20%;
+  top: 15%;
   left: 50%;
   transform: translate(-50%, -50%); 
   z-index: 0; /* 确保图像在半透明颜色层上面 */
@@ -90,35 +90,44 @@ form {
   
   
 fieldset {
-    border: 3px solid #ff9e00; /* 邊框顏色 */
-    background-color: rgba(255, 177, 51, 0.4);
+    /* border: 3px solid #ff9e00;  */
+    border: 3px solid transparent;
+    /* background-color: rgba(255, 255, 255, 0.4); */
+    background-color: transparent;
     padding: 20px; /* 內邊距 */
     margin: 0; /* 去除外邊距 */
     text-align: center; /* 将 legend 内容水平居中 */
     justify-content: center; /* 水平居中对齐 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  */
     border-radius: 20px;
 }
 
 legend {
-    font-family: 'cwtexyen', sans-serif; 
-    font-size: 10em; 
-    font-weight: bold; 
+    font-family: 'notosanstc', sans-serif; 
+    font-size: 8em; 
+    font-weight: 800; 
     color: #FFFFFF;
     margin-bottom: 5px; 
     padding: 0 10px; 
     word-spacing: 0.5em; 
-    text-shadow: 5px 5px #042938; 
+    -webkit-text-stroke: 4px #dca59d;
+    text-shadow: 
+        1px 1px #dca59d, 
+        2px 2px #c46c61, 
+        3px 3px #b76b54, 
+        4px 4px #a45a4d, 
+        5px 5px #9f4f40; /* 逐渐变换的颜色 */
 }
 .in_lbl {
-    font-family: 'cwtexyen', sans-serif;
+    font-family: 'notosanstc', sans-serif;
     display: block; /* 顯示為塊級元素 */
     font-size: 3em; 
-    color: #FFFFFF; 
+    font-weight:700;
+    color: #624934; 
     margin-bottom: 8px; 
     text-align: left; 
     margin-left: 60px;
-    text-shadow: 2px 2px #042938, 2px 2px #032c3c; /* 立体效果 */
+    text-shadow: 2px 2px #ffffff;
 }
 
 input[type="text"] {
@@ -126,10 +135,13 @@ input[type="text"] {
     font-size: 3em; 
     padding: 12px; 
     margin-bottom: 20px; 
-    border: 0.13em solid rgb(255, 157, 0);
+    border: none; 
+    /* border-bottom: 2px solid #624934;  */
+    /* border: 0.13em solid rgb(255, 249, 240); */
     border-radius: 7px; 
     box-sizing: border-box; 
-    background-color: rgba(255, 196, 102, 0.7); 
+    background: linear-gradient(45deg, rgba(244, 184, 176, 0.5), rgb(252, 208, 111, 0.5));
+    /* background-color: rgb(244, 184, 176, 0.4);  */
     color: #ffffff;
 }
 .form_group:last-of-type {
@@ -143,8 +155,8 @@ input[type="text"] {
   margin-top: 25px;
 }
 input[type="button"], input[type="submit"] {
-  background: linear-gradient(135deg, #ff9e00, #feaa23);
-  color: #FFFFFF; 
+  background: linear-gradient(45deg, rgba(235, 110, 128, 0.5), rgba(252, 208, 111, 0.5));
+  color: #624934; 
   font-family: 'Noto Sans', sans-serif;
   font-weight: bold; 
   border: none; 
@@ -163,13 +175,13 @@ input[type="button"] {
 }
 
 input[type="submit"]:hover, input[type="button"]:hover {
-  background: linear-gradient(135deg, #41908b, #1a7493); 
-  color: #053B50; 
+  background: linear-gradient(45deg, rgba(235, 110, 128, 0.8), rgba(252, 208, 111, 0.9)); 
+  color: #624934; 
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.7); /* 悬停时阴影效果 */
   transform: scale(1.05); 
 }
 input[type="submit"]:active, input[type="button"]:active {
-  background: linear-gradient(135deg, #4a4a4a, #6c8db2); /* 按下时背景渐变效果 */
+  background: linear-gradient(45deg, rgba(235, 110, 128, 0.8), rgba(252, 208, 111, 0.9)); /* 按下时背景渐变效果 */
   box-shadow: 2px 5px 8px rgba(0, 0, 0, 0.2); /* 按下时阴影效果 */
   transform: scale(0.98); /* 按下时按钮轻微缩小 */
 }
