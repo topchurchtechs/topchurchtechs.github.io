@@ -97,8 +97,8 @@ function init() {
         key = URLParams.get('key');
     }
     
-    $("#google_from").css("display", "block"); // Show the google_from div
-    $("#reader").css("display", "none");     // Hide the reader div
+    // $("#google_from").css("display", "block"); // Show the google_from div
+    // $("#reader").css("display", "none");     // Hide the reader div
 
     html5QrCode = new Html5Qrcode(/* element id */ "reader");
     startScan();
