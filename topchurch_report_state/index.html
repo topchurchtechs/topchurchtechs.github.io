@@ -1,39 +1,40 @@
 <!DOCTYPE html>
-<html>
-
-  <head>
-    <base target="_top">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
-    <title>topchurch_report</title>
+    <title>topchurch_report_state</title>
     <link rel="stylesheet" type="text/css" href="index.css">
-  </head>
-
-  <body>
+</head>
+<body>
     <div class="container">
       <form id="google_from" action="javascript:googleForm();">
         <fieldset>
-          <legend id="form_name">報 到</legend>
+          <legend id="form_name">報到狀態</legend>
           <div class="form_group">
-            <label class="in_lbl">編號</label><input type="text" name="sid" readonly>
+            <label class="in_lbl">第一堂</label><input type="text" name="state1" readonly>
           </div>
           <div class="form_group">
-            <label class="in_lbl">姓名</label><input type="text" name="sname" readonly>
+            <label class="in_lbl">第二堂</label><input type="text" name="state2" readonly>
           </div>
           <div class="form_group">
-            <label class="in_lbl">課堂</label><input type="text" name="class_number" readonly>
+            <label class="in_lbl">第三堂</label><input type="text" name="state3" readonly>
+          </div>
+          <div class="form_group">
+            <label class="in_lbl">第四堂</label><input type="text" name="state4" readonly>
+          </div>
+          <div class="form_group">
+            <label class="in_lbl">第五堂</label><input type="text" name="state5" readonly>
           </div>
           <div class="button-container">
             <input type="button" id="cancel_btn" value="取 消">
-            <input type="submit" value="送 出">
           </div>
         </fieldset>
       </form>
       <div id="reader"></div>
       
     </div>
-    <!-- <img src="./img/quote.png" class="overlay" alt="Overlay Image"> -->
     <script type="text/javascript" src="index.js"></script>
-  </body>
-
 </html>

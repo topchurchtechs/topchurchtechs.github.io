@@ -37,13 +37,13 @@ function googleForm() { //這裡要對應到自己的 javascript 名稱
         statusCode: {
             0: function() {
                 alert(`${field1} ${field2} 報到成功!`); //完成送出表單的警告視窗
-                window.location.assign(`https://topchurchtechs.github.io/topchurch_report_result?sid=${field1}&sname=${field2}&class_number=${field3}`); //送出表
+                window.location.assign(`https://topchurchtechs.github.io/topchurch_report_state?sid=${field1}&sname=${field2}&class_number=${field3}`); //送出表
                 // $("#google_from").css("display", "none"); // Hide the google_from div
                 // $("#reader").css("display", "block");     // Show the reader div單後的導向
             },
             200: function() {
                 alert(`${field1} ${field2} 報到成功!`); //完成送出表單的警告視窗
-                window.location.assign(`https://topchurchtechs.github.io/topchurch_report_result?sid=${field1}&sname=${field2}&class_number=${field3}`); //送出表
+                window.location.assign(`https://topchurchtechs.github.io/topchurch_report_state?sid=${field1}&sname=${field2}&class_number=${field3}`); //送出表
                 // $("#google_from").css("display", "none"); // Hide the google_from div
                 // $("#reader").css("display", "block");     // Show the reader div
             }
