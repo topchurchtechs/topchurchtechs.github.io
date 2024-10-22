@@ -8,7 +8,7 @@ let data = {
 console.log(data);
 let form = document.createElement('form');
 form.method = 'post';
-form.action = "https://script.google.com/macros/s/AKfycbypB0vG4b-LOn-FT6KVB6fDK42w_u8v-y_4v2hKzG_xVyMBf5AO8oIq5lAAOm7u5ZpR/exec"
+form.action = "https://script.google.com/macros/s/AKfycbx9Aha_85wswzTlYZ1xETh9OSaUnYrtIFKjhcaqekhtlAdMIaYdLbugabZbT3FcV65k/exec"
 document.body.appendChild(form);
 
 for (const key in data) {
