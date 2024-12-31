@@ -23,7 +23,7 @@ liff.init({
             }
             value = (value%223)+1
             let div_container = document.getElementById('div_container');
-            div_container.innerHTML=`<img class="img_card" src="img/2025跨年經文${value}.jpg">`
+            div_container.innerHTML=`<img class="img_card" src="img/2025 跨年經文卡${value}.jpg">`
         })
         .catch((err) => {
             liff.logout();
