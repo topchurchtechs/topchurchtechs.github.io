@@ -18,8 +18,8 @@ liff.init({
             }
             value = (value%223)+1
             let div_container = document.getElementById('div_container');
-            // div_container.innerHTML=`<img class="img_card" src="img/2026 跨年經文卡${value}.jpg">`
-            div_container.innerHTML=`<img class="img_card" src="img/2026 跨年經文卡 測試.jpg">`
+            div_container.innerHTML=`<img class="img_card" src="img/2026 跨年經文卡${value}.jpg">`
+            // div_container.innerHTML=`<img class="img_card" src="img/2026 跨年經文卡 測試.jpg">`
     return;
         })
         .catch((err) => {
