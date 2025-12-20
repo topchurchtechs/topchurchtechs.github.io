@@ -1,0 +1,211 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea, #764ba2, #f093fb, #4facfe);
+    background-size: 400% 400%;
+    animation: gradientFlow 15s ease infinite;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "PingFang TC", sans-serif;
+    overflow: hidden;
+}
+
+#waiting_container {
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.content {
+    text-align: center;
+    background: #ffffff;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+}
+
+h1 {
+    margin: 0 0 10px 0;
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #667eea;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.subtitle {
+    margin: 0 0 30px 0;
+    font-size: 1.2em;
+    font-weight: 500;
+    color: #764ba2;
+}
+
+#countdown {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.time-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 70px;
+}
+
+.time-value {
+    font-size: 3em;
+    font-weight: bold;
+    line-height: 1;
+    min-width: 70px;
+    padding: 10px;
+    border-radius: 10px;
+    color: #667eea;
+    background-color: #f7fafc;
+}
+
+.time-label {
+    font-size: 0.9em;
+    color: #666;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+.time-separator {
+    font-size: 2.5em;
+    font-weight: bold;
+    margin: 0 5px;
+    color: #764ba2;
+}
+
+.message {
+    margin: 30px 0 10px 0;
+    font-size: 1.1em;
+    color: #555;
+    font-weight: 500;
+}
+
+.description {
+    margin: 10px 0 0 0;
+    font-size: 1em;
+    color: #888;
+}
+
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* 減少動畫偏好設定 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    body, html {
+        background: #667eea;
+        animation: none;
+    }
+}
+
+/* 高對比度模式 */
+@media (prefers-contrast: high) {
+    h1,
+    .subtitle,
+    .time-value,
+    .time-separator {
+        background: none !important;
+        -webkit-text-fill-color: currentColor !important;
+        color: #2d3748 !important;
+    }
+
+    .content {
+        border: 2px solid #2d3748;
+    }
+
+    body, html {
+        background: #e2e8f0 !important;
+        animation: none;
+    }
+}
+
+
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2em;
+    }
+
+    .subtitle {
+        font-size: 1em;
+    }
+
+    .time-value {
+        font-size: 2.5em;
+        min-width: 60px;
+    }
+
+    .time-separator {
+        font-size: 2em;
+    }
+
+    .time-block {
+        min-width: 60px;
+    }
+
+    .message {
+        font-size: 1em;
+    }
+
+    .description {
+        font-size: 0.9em;
+    }
+
+    .content {
+        padding: 30px 20px;
+    }
+}
+
+@media (max-width: 400px) {
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .time-value {
+        font-size: 2em;
+        min-width: 50px;
+    }
+
+    .time-separator {
+        font-size: 1.5em;
+        margin: 0 2px;
+    }
+
+    .time-block {
+        min-width: 50px;
+    }
+
+    #countdown {
+        gap: 5px;
+    }
+}

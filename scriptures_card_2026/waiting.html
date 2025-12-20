@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+  <head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="2026跨年經文卡活動即將開始，倒數計時中">
+    <title>2026跨年經文 - 即將開始</title>
+    <link rel="stylesheet" type="text/css" href="waiting.css">
+  </head>
+
+  <body>
+    <main id="waiting_container" role="main">
+      <article class="content">
+        <header>
+          <h1>2026 跨年經文卡</h1>
+          <p class="subtitle">活動即將開始</p>
+        </header>
+
+        <section id="countdown" role="timer" aria-live="polite" aria-atomic="true" aria-label="活動開始倒數計時">
+          <div class="time-block">
+            <div class="time-value" id="days" aria-label="剩餘天數">00</div>
+            <div class="time-label" aria-hidden="true">天</div>
+          </div>
+          <div class="time-separator" aria-hidden="true">:</div>
+          <div class="time-block">
+            <div class="time-value" id="hours" aria-label="剩餘小時">00</div>
+            <div class="time-label" aria-hidden="true">時</div>
+          </div>
+          <div class="time-separator" aria-hidden="true">:</div>
+          <div class="time-block">
+            <div class="time-value" id="minutes" aria-label="剩餘分鐘">00</div>
+            <div class="time-label" aria-hidden="true">分</div>
+          </div>
+          <div class="time-separator" aria-hidden="true">:</div>
+          <div class="time-block">
+            <div class="time-value" id="seconds" aria-label="剩餘秒數">00</div>
+            <div class="time-label" aria-hidden="true">秒</div>
+          </div>
+        </section>
+
+        <footer>
+          <p class="message">活動將於 <time datetime="2026-01-01T00:00:00+08:00">2026年1月1日 00:00</time> 開始</p>
+          <p class="description">敬請期待您的專屬經文卡</p>
+        </footer>
+      </article>
+    </main>
+    <script type="text/javascript" src="waiting.js"></script>
+  </body>
+
+</html>
