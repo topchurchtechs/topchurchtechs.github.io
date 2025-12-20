@@ -10,7 +10,7 @@ liff.init({
         liff.getProfile()
         .then(profile => {
             let line_uid = profile.userId;
-            var hash = CryptoJS.HmacSHA256(line_uid, '20260101');
+            var hash = CryptoJS.HmacSHA256(line_uid, '20260101JesusLovesYou');
             hash = hash.toString(CryptoJS.enc.Hex);
             let value = 0;
             for(let i = 0; i < hash.length; i++) {
