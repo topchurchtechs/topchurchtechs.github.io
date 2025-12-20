@@ -1,5 +1,8 @@
 // 設定活動開始時間: 2026-01-01 00:00:00
-const eventStartTime = new Date('2025-01-01T00:00:00+08:00').getTime();
+const eventStartTime = new Date('2026-01-01T00:00:00+08:00').getTime();
+
+// 追蹤是否已經顯示活動開始訊息
+let hasEventStarted = false;
 
 // 檢查日期是否有效
 if (isNaN(eventStartTime)) {
@@ -27,22 +30,36 @@ function safeUpdateElement(id, value) {
 }
 
 function updateCountdown() {
+    // 如果活動已經開始過,直接返回,不再更新
+    if (hasEventStarted) {
+        return;
+    }
+
     try {
         const now = new Date().getTime();
         const distance = eventStartTime - now;
 
-        // 如果活動已經開始,跳轉到主頁面
+        // 如果活動已經開始,顯示等待提示
         if (distance < 0) {
+            // 標記活動已開始,避免重複執行
+            hasEventStarted = true;
+
             // 顯示提示訊息
             const countdownElement = document.getElementById('countdown');
             if (countdownElement) {
-                countdownElement.innerHTML = '<p style="color: #48bb78; font-size: 1.5em;">活動已開始！正在跳轉...</p>';
+                countdownElement.innerHTML = `
+                    <div style="text-align: center;">
+                        <p style="color: #48bb78; font-size: 2em; font-weight: bold; margin-bottom: 15px;">🎉 活動已開始！</p>
+                        <p style="color: #667eea; font-size: 1.3em; margin-bottom: 15px; font-weight: 500;">請重新掃描 QR Code</p>
+                        <p style="color: #888; font-size: 1em; line-height: 1.6;">
+                            以取得您的專屬經文卡<br>
+                            感謝您的耐心等待 ❤️
+                        </p>
+                    </div>
+                `;
             }
 
-            // 延遲跳轉,讓使用者看到訊息
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
+            // 停止繼續更新倒數
             return;
         }
 
