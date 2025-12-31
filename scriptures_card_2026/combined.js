@@ -1,5 +1,5 @@
 // 設定活動開始時間: 2026-01-01 00:00:00
-const eventStartTime = new Date('2026-01-01T00:00:00+08:00').getTime();
+const eventStartTime = new Date('2025-01-01T00:00:00+08:00').getTime();
 let hasEventStarted = false;
 let liffReady = false;
 let userProfile = null;
@@ -17,7 +17,9 @@ function initLiff() {
     }).then(function() {
         if (!liff.isLoggedIn()) {
             // 如果未登入，直接登入
-            liff.login();
+            // liff.login();
+            liffReady = true;
+            userProfile = { userId: "111" };
         } else {
             // 已登入，提前取得個人資料
             liff.getProfile()
@@ -175,8 +177,30 @@ function loadScriptureCard() {
             value += hash.charCodeAt(i);
         }
         value = (value % 223) + 1;
-        cardWrapper.innerHTML = `<img class="img_card" src="img/2026 跨年經文卡${value}.jpg" alt="2026跨年經文卡">`;
-        cardWrapper.classList.add('slide-in');
+
+        // 建立圖片元素
+        const img = document.createElement('img');
+        img.className = 'img_card';
+        img.alt = '2026跨年經文卡';
+        img.src = `img/2026 跨年經文卡${value}.jpg`;
+
+        // 圖片載入完成後才觸發動畫
+        img.onload = function() {
+            // 使用 requestAnimationFrame 確保瀏覽器準備好渲染
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    cardWrapper.classList.add('slide-in');
+                });
+            });
+        };
+
+        // 如果圖片載入失敗，也要顯示動畫（避免卡住）
+        img.onerror = function() {
+            console.error('圖片載入失敗');
+            cardWrapper.classList.add('slide-in');
+        };
+
+        cardWrapper.appendChild(img);
     } else {
         // 未登入或登入失敗，顯示錯誤訊息
         console.error('使用者未登入或 LIFF 初始化失敗');
@@ -198,7 +222,13 @@ function loadScriptureCard() {
                 ">重新載入</button>
             </div>
         `;
-        cardWrapper.classList.add('slide-in');
+
+        // 使用 requestAnimationFrame 確保 DOM 更新後再加動畫
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                cardWrapper.classList.add('slide-in');
+            });
+        });
     }
 }
 
