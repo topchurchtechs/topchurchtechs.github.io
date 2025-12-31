@@ -1,6 +1,5 @@
 // 設定活動開始時間: 2026-01-01 00:00:00
-const eventStartTime = new Date('2025-12-31T12:42:00+08:00').getTime();
-// const eventStartTime = new Date('2026-01-01T00:00:00+08:00').getTime();
+const eventStartTime = new Date('2026-01-01T00:00:00+08:00').getTime();
 let hasEventStarted = false;
 let liffReady = false;
 let userProfile = null;
