@@ -118,18 +118,47 @@ function showScriptureCard() {
         </div>
     `;
 
-    // 1.5 秒後開始淡出倒數計時，並顯示經文卡
-    setTimeout(() => {
-        countdownContainer.classList.add('fade-out');
-
+    // 等待 LIFF 準備好
+    waitForLiff().then(() => {
+        // 0.5 秒後開始淡出倒數計時，並顯示經文卡
         setTimeout(() => {
-            countdownContainer.classList.add('hidden');
-            cardContainer.classList.add('show');
+            countdownContainer.classList.add('fade-out');
 
-            // 初始化 LIFF 並載入經文卡
-            loadScriptureCard();
+            setTimeout(() => {
+                countdownContainer.classList.add('hidden');
+                cardContainer.classList.add('show');
+
+                // 載入經文卡
+                loadScriptureCard();
+            }, 500);
         }, 500);
-    }, 500);
+    });
+}
+
+// 等待 LIFF 初始化完成
+function waitForLiff() {
+    return new Promise((resolve) => {
+        // 如果已經準備好，直接返回
+        if (liffReady) {
+            resolve();
+            return;
+        }
+
+        // 否則每 100ms 檢查一次
+        const checkInterval = setInterval(() => {
+            if (liffReady) {
+                clearInterval(checkInterval);
+                resolve();
+            }
+        }, 100);
+
+        // 設定最長等待時間 5 秒，避免無限等待
+        setTimeout(() => {
+            clearInterval(checkInterval);
+            console.warn('LIFF 初始化超時，繼續執行');
+            resolve();
+        }, 5000);
+    });
 }
 
 // 載入經文卡
@@ -150,8 +179,26 @@ function loadScriptureCard() {
         cardWrapper.innerHTML = `<img class="img_card" src="img/2026 跨年經文卡${value}.jpg" alt="2026跨年經文卡">`;
         cardWrapper.classList.add('slide-in');
     } else {
-        // 未登入或登入失敗，顯示測試圖片
-        cardWrapper.innerHTML = `<img class="img_card" src="img/2026 跨年經文卡 測試.jpg" alt="2026跨年經文卡">`;
+        // 未登入或登入失敗，顯示錯誤訊息
+        console.error('使用者未登入或 LIFF 初始化失敗');
+        cardWrapper.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px; color: #333;">
+                <p style="font-size: 3em; margin-bottom: 20px;">😔</p>
+                <p style="font-size: 1.5em; font-weight: bold; margin-bottom: 15px; color: #e53e3e;">無法載入經文卡</p>
+                <p style="font-size: 1.1em; margin-bottom: 25px; color: #666;">請確認您是從 LINE 開啟此頁面</p>
+                <button onclick="location.reload()" style="
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    padding: 15px 40px;
+                    font-size: 1.1em;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    font-weight: bold;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                ">重新載入</button>
+            </div>
+        `;
         cardWrapper.classList.add('slide-in');
     }
 }
