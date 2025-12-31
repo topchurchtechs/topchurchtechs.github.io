@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026跨年經文</title>
+    <script type="text/javascript" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.js"></script>
+    <link rel="stylesheet" type="text/css" href="combined.css">
+</head>
+<body>
+    <!-- 倒數計時區塊 -->
+    <div id="countdown-container">
+        <h1 class="title">✨ 2026 跨年經文卡 ✨</h1>
+        <div id="countdown" class="countdown-grid" role="timer" aria-live="polite">
+            <div class="time-box">
+                <span class="time-value" id="days">00</span>
+                <span class="time-label">天</span>
+            </div>
+            <div class="time-box">
+                <span class="time-value" id="hours">00</span>
+                <span class="time-label">時</span>
+            </div>
+            <div class="time-box">
+                <span class="time-value" id="minutes">00</span>
+                <span class="time-label">分</span>
+            </div>
+            <div class="time-box">
+                <span class="time-value" id="seconds">00</span>
+                <span class="time-label">秒</span>
+            </div>
+        </div>
+        <p class="subtitle">🎊 準備迎接新年的祝福 🎊</p>
+    </div>
+
+    <!-- 經文卡區塊 -->
+    <div id="card-container">
+        <div class="card-wrapper" id="card-wrapper">
+            <!-- 經文卡圖片會動態插入這裡 -->
+        </div>
+    </div>
+
+    <script type="text/javascript" src="combined.js"></script>
+</body>
+</html>
