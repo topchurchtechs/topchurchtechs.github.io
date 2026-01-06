@@ -4,85 +4,52 @@ let hasEventStarted = false;
 let liffReady = false;
 let userProfile = null;
 
-// ============= 方案 4: 混合方案 (localStorage + 設備指紋) =============
-
-// 簡單的 hash 函數
-function simpleHash(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash; // Convert to 32bit integer
-    }
-    return Math.abs(hash);
-}
-
-// 生成 Canvas 指紋
-function getCanvasFingerprint() {
-    try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        ctx.textBaseline = 'top';
-        ctx.font = '14px "Arial"';
-        ctx.fillStyle = '#f60';
-        ctx.fillRect(125, 1, 62, 20);
-        ctx.fillStyle = '#069';
-        ctx.fillText('Scripture Card 2026 🙏', 2, 15);
-
-        return canvas.toDataURL();
-    } catch (e) {
-        return 'canvas-error';
-    }
-}
-
-// 生成設備指紋
-function generateDeviceFingerprint() {
-    const components = {
-        userAgent: navigator.userAgent || 'unknown',
-        language: navigator.language || 'unknown',
-        screenRes: `${screen.width}x${screen.height}x${screen.colorDepth}`,
-        timezone: new Date().getTimezoneOffset(),
-        platform: navigator.platform || 'unknown',
-        hardwareConcurrency: navigator.hardwareConcurrency || 0,
-        deviceMemory: navigator.deviceMemory || 0,
-        canvas: getCanvasFingerprint()
-    };
-
-    const fingerprintString = JSON.stringify(components);
-    return 'fp_' + simpleHash(fingerprintString);
-}
-
-// 獲取或創建穩定的用戶 ID
-function getStableUserId() {
-    const STORAGE_KEY = 'scripture_card_user_id';
-
-    // 1. 先檢查 localStorage
-    let storedId = localStorage.getItem(STORAGE_KEY);
-
-    if (storedId) {
-        console.log('使用已存儲的用戶 ID:', storedId);
-        return storedId;
-    }
-
-    // 2. 生成設備指紋作為備份
-    const fingerprint = generateDeviceFingerprint();
-    console.log('生成新的設備指紋 ID:', fingerprint);
-
-    // 3. 保存到 localStorage
-    try {
-        localStorage.setItem(STORAGE_KEY, fingerprint);
-    } catch (e) {
-        console.warn('無法保存到 localStorage:', e);
-    }
-
-    return fingerprint;
-}
-
 // 檢查日期是否有效
 if (isNaN(eventStartTime)) {
     console.error('無效的活動開始時間');
     document.getElementById('countdown').innerHTML = '<p style="color: #fff;">時間設定錯誤，請聯繫管理員</p>';
+}
+
+// 生成簡單隨機 ID（localStorage + 隨機數）
+function generateSimpleUserId() {
+    const STORAGE_KEY = 'scripture_card_user_id';
+
+    // 1. 先檢查 localStorage
+    try {
+        let storedId = localStorage.getItem(STORAGE_KEY);
+        if (storedId) {
+            console.log('使用已存儲的隨機 ID:', storedId);
+            return storedId;
+        }
+    } catch (e) {
+        console.warn('無法讀取 localStorage (可能是無痕模式):', e);
+    }
+
+    // 2. 生成新的隨機 ID
+    const randomId = 'anon_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15);
+    console.log('生成新的隨機 ID:', randomId);
+
+    // 3. 嘗試保存到 localStorage
+    try {
+        localStorage.setItem(STORAGE_KEY, randomId);
+        console.log('成功保存到 localStorage');
+    } catch (e) {
+        console.warn('無法保存到 localStorage (可能是無痕模式):', e);
+    }
+
+    return randomId;
+}
+
+// 顯示登入選擇界面
+function showLoginChoice() {
+    document.getElementById('countdown-container').classList.add('hidden');
+    document.getElementById('login-choice-container').classList.remove('hidden');
+}
+
+// 隱藏登入選擇界面
+function hideLoginChoice() {
+    document.getElementById('login-choice-container').classList.add('hidden');
+    document.getElementById('countdown-container').classList.remove('hidden');
 }
 
 // 頁面載入時就初始化 LIFF
@@ -91,16 +58,25 @@ function initLiff() {
         'liffId': '1657754998-43Wx5y06',
     }).then(function() {
         if (!liff.isLoggedIn()) {
-            // 如果未登入，使用方案 4 的混合方案
-            console.log('用戶未登入 LINE，使用替代方案生成唯一 ID');
-            const stableUserId = getStableUserId();
-            userProfile = {
-                userId: stableUserId,
-                displayName: '訪客',
-                isAnonymous: true
-            };
-            liffReady = true;
-            console.log('使用替代 ID:', stableUserId);
+            // 未登入 LINE
+            const isInLineApp = liff.isInClient();
+
+            if (isInLineApp) {
+                // 在 LINE app 內但未登入 - 執行登入
+                console.log('在 LINE app 內但未登入，執行登入');
+                liff.login();
+            } else {
+                // 在外部瀏覽器 - 顯示選擇界面
+                console.log('在外部瀏覽器，顯示登入選擇');
+                // liffReady = true; // 標記為就緒，讓界面可以顯示
+                // const randomId = generateSimpleUserId();
+                // userProfile = {
+                //     userId: randomId,
+                //     displayName: '訪客',
+                //     isAnonymous: true
+                // };
+                showLoginChoice();
+            }
         } else {
             // 已登入，提前取得個人資料
             liff.getProfile()
@@ -113,28 +89,28 @@ function initLiff() {
                 })
                 .catch((err) => {
                     console.error('取得個人資料失敗:', err);
-                    // 取得 profile 失敗，使用替代方案
-                    const stableUserId = getStableUserId();
+                    // 取得 profile 失敗，使用隨機 ID
+                    const randomId = generateSimpleUserId();
                     userProfile = {
-                        userId: stableUserId,
+                        userId: randomId,
                         displayName: '訪客',
                         isAnonymous: true
                     };
                     liffReady = true;
-                    console.log('使用替代 ID (profile 失敗):', stableUserId);
+                    console.log('使用隨機 ID (profile 失敗):', randomId);
                 });
         }
     }).catch(function(err) {
         console.error('LIFF 初始化失敗:', err);
-        // LIFF 初始化失敗（可能不在 LINE 環境），使用替代方案
-        const stableUserId = getStableUserId();
+        // LIFF 初始化失敗（可能不在 LINE 環境），使用隨機 ID
+        const randomId = generateSimpleUserId();
         userProfile = {
-            userId: stableUserId,
+            userId: randomId,
             displayName: '訪客',
             isAnonymous: true
         };
         liffReady = true;
-        console.log('使用替代 ID (LIFF 失敗):', stableUserId);
+        console.log('使用隨機 ID (LIFF 失敗):', randomId);
     });
 }
 
@@ -235,29 +211,22 @@ function showScriptureCard() {
     });
 }
 
-// 等待 LIFF 初始化完成
+// 等待 LIFF 初始化完成且用戶完成選擇
 function waitForLiff() {
     return new Promise((resolve) => {
-        // 如果已經準備好，直接返回
-        if (liffReady) {
+        // 如果已經準備好且有 userProfile，直接返回
+        if (liffReady && userProfile) {
             resolve();
             return;
         }
 
-        // 否則每 100ms 檢查一次
+        // 否則每 100ms 檢查一次，無限等待直到用戶做出選擇
         const checkInterval = setInterval(() => {
-            if (liffReady) {
+            if (liffReady && userProfile) {
                 clearInterval(checkInterval);
                 resolve();
             }
         }, 100);
-
-        // 設定最長等待時間 5 秒，避免無限等待
-        setTimeout(() => {
-            clearInterval(checkInterval);
-            console.warn('LIFF 初始化超時，繼續執行');
-            resolve();
-        }, 5000);
     });
 }
 
@@ -348,6 +317,26 @@ if (document.readyState === 'loading') {
 }
 
 function init() {
+    // 綁定登入選擇按鈕事件
+    document.getElementById('line-login-btn').addEventListener('click', function() {
+        console.log('用戶選擇 LINE 登入');
+        liff.login();
+    });
+
+    document.getElementById('anonymous-btn').addEventListener('click', function() {
+        console.log('用戶選擇匿名模式');
+        const randomId = generateSimpleUserId();
+        userProfile = {
+            userId: randomId,
+            displayName: '訪客',
+            isAnonymous: true
+        };
+        liffReady = true;
+
+        // 隱藏登入選擇界面，顯示倒數計時
+        hideLoginChoice();
+    });
+
     // 先初始化 LIFF (處理登入)
     initLiff();
     // 再初始化倒數計時

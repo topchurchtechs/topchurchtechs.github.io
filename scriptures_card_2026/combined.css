@@ -14,6 +14,11 @@ body {
     overflow: hidden;
 }
 
+/* 通用隱藏類別 */
+.hidden {
+    display: none !important;
+}
+
 /* 倒數計時容器 */
 #countdown-container {
     text-align: center;
@@ -168,6 +173,82 @@ body {
     100% { opacity: 0; }
 }
 
+/* 登入選擇界面 */
+.login-choice-container {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.login-choice-icon {
+    font-size: 1.8em;
+    margin-bottom: 20px;
+}
+
+.login-choice-title {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.login-choice-description {
+    font-size: 1em;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.login-btn {
+    width: 100%;
+    border: none;
+    padding: 18px 30px;
+    font-size: 1.1em;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 15px;
+}
+
+.login-btn:hover {
+    transform: scale(1.02);
+}
+
+.login-btn:active {
+    transform: scale(0.98);
+}
+
+.login-btn-line {
+    background: linear-gradient(135deg, #06C755 0%, #00B900 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(6, 199, 85, 0.3);
+}
+
+.login-btn-line:hover {
+    box-shadow: 0 6px 20px rgba(6, 199, 85, 0.4);
+}
+
+.login-btn-anonymous {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.login-btn-anonymous:hover {
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.login-choice-warning {
+    font-size: 0.85em;
+    color: #999;
+    margin-top: 20px;
+    line-height: 1.5;
+}
+
 @media (max-width: 768px) {
     .title {
         font-size: 1.8em;
@@ -183,5 +264,15 @@ body {
 
     .time-box {
         padding: 15px;
+    }
+
+    .login-choice-container {
+        max-width: 90%;
+        padding: 30px 15px;
+    }
+
+    .login-btn {
+        padding: 15px 25px;
+        font-size: 1em;
     }
 }
