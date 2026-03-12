@@ -24,7 +24,7 @@
    |----------|------|
    | `id` | 學生 ID |
    | `name` | 學生姓名 |
-   | `class` | 班別 |
+   | `type` | 簽到類型（`簽到` 或 `簽退`） |
    | `serviceToken` | 驗證用 token |
 
 2. 表單右上角三點選單 → **建立回應試算表**（Apps Script 需要用到）
@@ -46,22 +46,11 @@ const CONFIG = {
   fields: {
     id:           "entry.XXXXXXXXXX",
     name:         "entry.XXXXXXXXXX",
-    className:    "entry.XXXXXXXXXX",
+    type:         "entry.XXXXXXXXXX",
     serviceToken: "entry.XXXXXXXXXX",
   },
   cooldownMs: 5000, // 同一學生重複掃描的冷卻時間（毫秒）
 };
-```
-
-同樣修改 `index.html` 的班別選單，換成實際的班別名稱：
-
-```html
-<select id="class-select">
-  <option value="">— 選擇班別 —</option>
-  <option value="classA">classA</option>
-  <option value="classB">classB</option>
-  <option value="classC">classC</option>
-</select>
 ```
 
 ---
