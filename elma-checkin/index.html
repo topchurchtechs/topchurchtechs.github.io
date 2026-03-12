@@ -291,8 +291,9 @@
       const parts = token.trim().split(".");
       if (parts.length !== 3) throw new Error("不是有效的 JWT 格式");
       const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-      const json = atob(base64.padEnd(base64.length + (4 - base64.length % 4) % 4, "="));
-      return JSON.parse(json);
+      const binary = atob(base64.padEnd(base64.length + (4 - base64.length % 4) % 4, "="));
+      const bytes  = Uint8Array.from(binary, c => c.charCodeAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
     }
 
     // ─── Google 表單提交（hidden iframe，繞過 CORS） ────────────────────────────
