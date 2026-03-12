@@ -44,15 +44,23 @@
       text-align: center;
     }
     header h1 { font-size: 1.5rem; font-weight: 700; }
-    header .class-badge {
-      display: inline-block;
-      margin-top: 0.4rem;
-      padding: 0.2rem 0.75rem;
-      background: #1e40af;
-      border-radius: 99px;
-      font-size: 0.85rem;
-      color: #bfdbfe;
+    .class-select-wrapper {
+      margin-top: 0.5rem;
     }
+    #class-select {
+      appearance: none;
+      background: #1e40af url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2393c5fd' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 0.65rem center;
+      border: 1px solid #2563eb;
+      border-radius: 99px;
+      color: #bfdbfe;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.3rem 2rem 0.3rem 0.9rem;
+      cursor: pointer;
+      outline: none;
+    }
+    #class-select:focus { border-color: #60a5fa; }
+    #class-select option { background: #1e293b; color: #f1f5f9; }
 
     .camera-wrapper {
       position: relative;
@@ -209,7 +217,7 @@
     <div class="icon">⚠️</div>
     <h2>缺少必要參數</h2>
     <p>請以正確連結開啟本頁面，例如：<br>
-      <code style="color:#7dd3fc">?serviceToken=TOKEN&amp;class=CLASS_NAME</code>
+      <code style="color:#7dd3fc">?serviceToken=TOKEN</code>
     </p>
   </div>
 
@@ -217,7 +225,14 @@
   <div id="main-screen">
     <header>
       <h1>📋 點名系統</h1>
-      <span class="class-badge" id="class-label"></span>
+      <div class="class-select-wrapper">
+        <select id="class-select">
+          <option value="">— 選擇班別 —</option>
+          <option value="classA">classA</option>
+          <option value="classB">classB</option>
+          <option value="classC">classC</option>
+        </select>
+      </div>
     </header>
 
     <div class="camera-wrapper" id="camera-wrapper">
@@ -261,15 +276,13 @@
     // 讀取並隱藏 URL 參數
     const urlParams = new URLSearchParams(window.location.search);
     const SERVICE_TOKEN = urlParams.get("serviceToken");
-    const CLASS_NAME    = urlParams.get("class");
     history.replaceState({}, document.title, window.location.pathname);
 
     // 驗證參數
-    if (!SERVICE_TOKEN || !CLASS_NAME) {
+    if (!SERVICE_TOKEN) {
       document.getElementById("error-screen").style.display = "flex";
     } else {
       document.getElementById("main-screen").style.display = "flex";
-      document.getElementById("class-label").textContent = CLASS_NAME;
       startCamera();
     }
 
@@ -292,7 +305,7 @@
       const data = {
         [CONFIG.fields.id]:           id,
         [CONFIG.fields.name]:         name,
-        [CONFIG.fields.className]:    CLASS_NAME,
+        [CONFIG.fields.className]:    document.getElementById("class-select").value,
         [CONFIG.fields.serviceToken]: SERVICE_TOKEN,
       };
 
@@ -397,6 +410,11 @@
       if (!id || !name) {
         showToast("QR Code 缺少 id 或 name 欄位", "error");
         addLog(`id:${id} name:${name}`, "—", "err");
+        return;
+      }
+
+      if (!document.getElementById("class-select").value) {
+        showToast("請先選擇班別", "error");
         return;
       }
 
