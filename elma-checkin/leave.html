@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>請假申請</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #f1f5f9;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem 1rem 4rem;
+    }
+
+    #main-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    header {
+      text-align: center;
+      padding-top: 0.5rem;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; }
+
+    /* ── 相機區塊 ── */
+    #btn-camera {
+      width: 100%;
+      padding: 0.75rem 1.25rem;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 0.75rem;
+      color: #94a3b8;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    #btn-camera:hover { background: #263549; color: #e2e8f0; }
+    #btn-camera.active { background: #0f2744; color: #7dd3fc; border-color: #38bdf8; }
+
+    .camera-wrapper {
+      display: none;
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      background: #1e293b;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 2px solid #334155;
+    }
+    .camera-wrapper.open { display: block; }
+
+    #camera-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .scan-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .scan-frame {
+      width: 60%;
+      aspect-ratio: 1;
+      position: relative;
+    }
+    .scan-frame::before,
+    .scan-frame::after,
+    .scan-frame > span::before,
+    .scan-frame > span::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #38bdf8;
+      border-style: solid;
+    }
+    .scan-frame::before        { top: 0;    left: 0;  border-width: 3px 0 0 3px; }
+    .scan-frame::after         { top: 0;    right: 0; border-width: 3px 3px 0 0; }
+    .scan-frame > span::before { bottom: 0; left: 0;  border-width: 0 0 3px 3px; }
+    .scan-frame > span::after  { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
+
+    .scan-line {
+      position: absolute;
+      left: 5%; right: 5%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+      animation: scan 2s ease-in-out infinite;
+      top: 10%;
+    }
+    @keyframes scan {
+      0%   { top: 10%; opacity: 1; }
+      90%  { top: 90%; opacity: 1; }
+      100% { top: 90%; opacity: 0; }
+    }
+
+    .camera-wrapper.flash::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.35);
+      animation: flash 0.3s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes flash { from { opacity: 1; } to { opacity: 0; } }
+
+    /* ── 表單 ── */
+    .form-card {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 1rem;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .field label {
+      font-size: 0.875rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+    .field input[type="text"],
+    .field textarea {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      color: #f1f5f9;
+      font-size: 1rem;
+      padding: 0.65rem 0.875rem;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+      font-family: inherit;
+    }
+    .field input[type="text"]:focus,
+    .field textarea:focus { border-color: #38bdf8; }
+    .field input.error,
+    .field textarea.error { border-color: #ef4444; }
+    .field textarea { resize: vertical; min-height: 80px; }
+
+    /* 掃描後顯示的姓名提示 */
+    #scanned-name {
+      display: none;
+      font-size: 0.875rem;
+      color: #7dd3fc;
+      padding: 0.4rem 0.875rem;
+      background: #0f2744;
+      border-radius: 0.4rem;
+      border: 1px solid #38bdf8;
+    }
+    #scanned-name.show { display: block; }
+
+    /* 是/否 toggle */
+    .yn-toggle {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .yn-toggle button {
+      flex: 1;
+      padding: 0.55rem 0;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      background: #0f172a;
+      color: #64748b;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .yn-toggle button.selected-yes {
+      background: #14532d;
+      color: #bbf7d0;
+      border-color: #22c55e;
+    }
+    .yn-toggle button.selected-no {
+      background: #450a0a;
+      color: #fecaca;
+      border-color: #ef4444;
+    }
+
+    .field-note {
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    .error-msg {
+      font-size: 0.8rem;
+      color: #f87171;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    #btn-submit {
+      width: 100%;
+      padding: 0.85rem;
+      background: #166534;
+      color: #bbf7d0;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    #btn-submit:hover { background: #15803d; }
+    #btn-submit:active { background: #14532d; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(6rem);
+      min-width: 260px;
+      max-width: 90vw;
+      padding: 0.9rem 1.25rem;
+      border-radius: 0.75rem;
+      font-size: 1.05rem;
+      text-align: center;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.success { background: #166534; color: #bbf7d0; border: 1px solid #22c55e; }
+    #toast.error   { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+    #toast.info    { background: #1e3a5f; color: #bae6fd; border: 1px solid #38bdf8; }
+
+    #submit-frame { display: none; }
+  </style>
+</head>
+<body>
+
+  <div id="main-screen">
+    <header>
+      <h1>📝 請假申請</h1>
+    </header>
+
+    <!-- 相機區 -->
+    <button id="btn-camera" onclick="toggleCamera()">📷 掃描 QR Code</button>
+    <div class="camera-wrapper" id="camera-wrapper">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <div class="scan-overlay">
+        <div class="scan-frame">
+          <span></span>
+          <div class="scan-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 表單 -->
+    <div class="form-card">
+
+      <div class="field">
+        <label for="input-id">學號 ID</label>
+        <input type="text" id="input-id" placeholder="請輸入學號或掃描 QR Code" autocomplete="off" />
+        <div id="scanned-name"></div>
+        <span class="error-msg" id="err-id">請輸入學號</span>
+      </div>
+
+      <div class="field">
+        <label for="input-reason">請假原因</label>
+        <textarea id="input-reason" placeholder="請簡述請假原因"></textarea>
+        <span class="error-msg" id="err-reason">請填寫請假原因</span>
+      </div>
+
+      <div class="field">
+        <label>是否已知會導師</label>
+        <div class="yn-toggle">
+          <button id="yn-mentor-yes" onclick="selectYN('mentor', '是')">是</button>
+          <button id="yn-mentor-no"  onclick="selectYN('mentor', '否')">否</button>
+        </div>
+        <span class="error-msg" id="err-mentor">請選擇是否已知會導師</span>
+      </div>
+
+      <div class="field">
+        <label>是否已知會主管</label>
+        <span class="field-note">（實習生填寫）</span>
+        <div class="yn-toggle">
+          <button id="yn-supervisor-yes" onclick="selectYN('supervisor', '是')">是</button>
+          <button id="yn-supervisor-no"  onclick="selectYN('supervisor', '否')">否</button>
+        </div>
+        <span class="error-msg" id="err-supervisor">請選擇是否已知會主管</span>
+      </div>
+
+      <button id="btn-submit" onclick="handleSubmit()">送出請假申請</button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <iframe id="submit-frame" name="submit-frame"></iframe>
+  <canvas id="qr-canvas" style="display:none"></canvas>
+
+  <script>
+    // ─── 設定區 ────────────────────────────────────────────────────────────────
+    const CONFIG = {
+      formAction: "https://docs.google.com/forms/d/e/1FAIpQLSdAU2rU3AejnrdR5qMYfzDXxcfdlxeIa2usLHr-bJmkdtBKfA/formResponse",
+      fields: {
+        id:         "entry.558259535",
+        reason:     "entry.1711275962",
+        mentor:     "entry.1739851223",
+        supervisor: "entry.1976005869",
+      },
+    };
+    // ───────────────────────────────────────────────────────────────────────────
+
+    // 是/否 選擇狀態
+    const yn = { mentor: null, supervisor: null };
+
+    function selectYN(group, value) {
+      yn[group] = value;
+      const yes = document.getElementById(`yn-${group}-yes`);
+      const no  = document.getElementById(`yn-${group}-no`);
+      yes.className = value === "是" ? "selected-yes" : "";
+      no.className  = value === "否" ? "selected-no"  : "";
+      document.getElementById(`err-${group}`).classList.remove("show");
+    }
+
+    // ─── JWT 解析（僅 decode payload，不驗簽） ─────────────────────────────────
+    function decodeJWT(token) {
+      const parts = token.trim().split(".");
+      if (parts.length !== 3) throw new Error("不是有效的 JWT 格式");
+      const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+      const binary = atob(base64.padEnd(base64.length + (4 - base64.length % 4) % 4, "="));
+      const bytes  = Uint8Array.from(binary, c => c.charCodeAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    // ─── Toast ─────────────────────────────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg, type = "info") {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className = `show ${type}`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = ""; }, 3500);
+    }
+
+    // ─── 相機開關 ──────────────────────────────────────────────────────────────
+    let cameraStream = null;
+    let scanning = false;
+
+    async function toggleCamera() {
+      const wrapper = document.getElementById("camera-wrapper");
+      if (wrapper.classList.contains("open")) {
+        closeCamera();
+      } else {
+        document.getElementById("btn-camera").classList.add("active");
+        document.getElementById("btn-camera").textContent = "⏹ 關閉相機";
+        wrapper.classList.add("open");
+        await startCamera();
+      }
+    }
+
+    function closeCamera() {
+      scanning = false;
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+        cameraStream = null;
+      }
+      document.getElementById("camera-wrapper").classList.remove("open");
+      const btn = document.getElementById("btn-camera");
+      btn.classList.remove("active");
+      btn.textContent = "📷 掃描 QR Code";
+    }
+
+    async function startCamera() {
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 1280 } }
+        });
+        const video = document.getElementById("camera-video");
+        video.srcObject = cameraStream;
+        video.addEventListener("loadedmetadata", () => {
+          video.play();
+          scanning = true;
+          requestAnimationFrame(scanLoop);
+        }, { once: true });
+      } catch (err) {
+        closeCamera();
+        showToast("無法存取相機：" + err.message, "error");
+      }
+    }
+
+    const canvas = document.getElementById("qr-canvas");
+    const ctx    = canvas.getContext("2d", { willReadFrequently: true });
+    let lastCode = null;
+
+    function scanLoop() {
+      if (!scanning) return;
+      const video = document.getElementById("camera-video");
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const qr = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+        if (qr && qr.data && qr.data !== lastCode) {
+          lastCode = qr.data;
+          setTimeout(() => { lastCode = null; }, 1500);
+          handleQRCode(qr.data);
+        }
+      }
+      requestAnimationFrame(scanLoop);
+    }
+
+    function handleQRCode(raw) {
+      let payload;
+      try {
+        payload = decodeJWT(raw);
+      } catch {
+        showToast("無效的 QR Code 格式", "error");
+        return;
+      }
+
+      const { id, name } = payload;
+      if (!id) {
+        showToast("QR Code 缺少 id 欄位", "error");
+        return;
+      }
+
+      document.getElementById("input-id").value = id;
+      document.getElementById("input-id").classList.remove("error");
+      document.getElementById("err-id").classList.remove("show");
+
+      // 顯示姓名作為確認（name 只顯示，不送出）
+      const nameEl = document.getElementById("scanned-name");
+      if (name) {
+        nameEl.textContent = `👤 ${name}`;
+        nameEl.classList.add("show");
+      } else {
+        nameEl.classList.remove("show");
+      }
+
+      // 視覺回饋後關閉相機
+      const wrapper = document.getElementById("camera-wrapper");
+      wrapper.classList.remove("flash");
+      void wrapper.offsetWidth;
+      wrapper.classList.add("flash");
+      wrapper.addEventListener("animationend", () => {
+        wrapper.classList.remove("flash");
+        closeCamera();
+      }, { once: true });
+
+      showToast(`✅ 已填入：${name ?? id}`, "success");
+    }
+
+    // ─── 表單送出 ──────────────────────────────────────────────────────────────
+    function handleSubmit() {
+      let valid = true;
+
+      const idEl     = document.getElementById("input-id");
+      const reasonEl = document.getElementById("input-reason");
+
+      if (!idEl.value.trim()) {
+        idEl.classList.add("error");
+        document.getElementById("err-id").classList.add("show");
+        valid = false;
+      } else {
+        idEl.classList.remove("error");
+        document.getElementById("err-id").classList.remove("show");
+      }
+
+      if (!reasonEl.value.trim()) {
+        reasonEl.classList.add("error");
+        document.getElementById("err-reason").classList.add("show");
+        valid = false;
+      } else {
+        reasonEl.classList.remove("error");
+        document.getElementById("err-reason").classList.remove("show");
+      }
+
+      if (!yn.mentor) {
+        document.getElementById("err-mentor").classList.add("show");
+        valid = false;
+      }
+
+      if (!yn.supervisor) {
+        document.getElementById("err-supervisor").classList.add("show");
+        valid = false;
+      }
+
+      if (!valid) return;
+
+      submitToGoogleForm(
+        idEl.value.trim(),
+        reasonEl.value.trim(),
+        yn.mentor,
+        yn.supervisor
+      );
+
+      showToast("✅ 請假申請已送出", "success");
+
+      // 清空表單
+      idEl.value     = "";
+      reasonEl.value = "";
+      document.getElementById("scanned-name").classList.remove("show");
+      resetYN("mentor");
+      resetYN("supervisor");
+    }
+
+    function resetYN(group) {
+      yn[group] = null;
+      document.getElementById(`yn-${group}-yes`).className = "";
+      document.getElementById(`yn-${group}-no`).className  = "";
+    }
+
+    // ─── Google 表單提交（hidden iframe，繞過 CORS） ────────────────────────────
+    function submitToGoogleForm(id, reason, mentor, supervisor) {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = CONFIG.formAction;
+      form.target = "submit-frame";
+
+      const data = {
+        [CONFIG.fields.id]:         id,
+        [CONFIG.fields.reason]:     reason,
+        [CONFIG.fields.mentor]:     mentor,
+        [CONFIG.fields.supervisor]: supervisor,
+      };
+
+      for (const [key, value] of Object.entries(data)) {
+        const input = document.createElement("input");
+        input.type  = "hidden";
+        input.name  = key;
+        input.value = value ?? "";
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+    }
+  </script>
+</body>
+</html>

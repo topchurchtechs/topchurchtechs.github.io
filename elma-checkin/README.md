@@ -8,7 +8,7 @@
 
 ```
 老師開啟點名頁面（含 serviceToken）
-  → 選擇班別
+  → 選擇簽到 / 簽退
   → 掃描學生 QR Code（JWT）
   → 自動送出到 Google 表單
   → Apps Script 驗證 serviceToken，無效則刪除該筆記錄
@@ -16,14 +16,24 @@
 
 ---
 
-## 步驟一：設定 Google 表單
+## 頁面路由
 
-1. 建立一份新的 Google 表單，加入以下 **4 個簡答欄位**，標題需完全一致：
+| 路由 | 說明 | 使用者 | 需要 serviceToken |
+|------|------|--------|:-----------------:|
+| `/elma-checkin/` | 點名頁面 | 老師 | ✅ |
+| `/elma-checkin/leave.html` | 請假申請 | 學生 / 家長 | ❌（完全公開） |
+| `/elma-checkin/generate-qr-jwt.html` | 單筆 QR Code 產生器 | 管理員 | ❌ |
+| `/elma-checkin/generate-qr-batch.html` | 批次 QR Code 產生器（CSV） | 管理員 | ❌ |
+
+---
+
+## 步驟一：設定 Google 表單（點名用）
+
+1. 建立一份新的 Google 表單，加入以下 **3 個簡答欄位**，標題需完全一致：
 
    | 欄位標題 | 說明 |
    |----------|------|
    | `id` | 學生 ID |
-   | `name` | 學生姓名 |
    | `type` | 簽到類型（`簽到` 或 `簽退`） |
    | `serviceToken` | 驗證用 token |
 
@@ -45,7 +55,6 @@ const CONFIG = {
   formAction: "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse",
   fields: {
     id:           "entry.XXXXXXXXXX",
-    name:         "entry.XXXXXXXXXX",
     type:         "entry.XXXXXXXXXX",
     serviceToken: "entry.XXXXXXXXXX",
   },
@@ -89,17 +98,6 @@ GitHub Pages 設定：repo → Settings → Pages → Branch: `main`
 
 ---
 
-## 頁面路由
-
-| 路由 | 說明 | 使用者 |
-|------|------|--------|
-| `/elma-checkin/` | 點名頁面 | 老師 |
-| `/elma-checkin/generate-qr-jwt.html` | 單筆 QR Code 產生器 | 管理員 |
-
-所有頁面皆需帶 `?serviceToken=TOKEN` 才能進入，否則顯示錯誤畫面。
-
----
-
 ## 使用方式
 
 ### 點名頁面（老師使用）
@@ -108,18 +106,28 @@ GitHub Pages 設定：repo → Settings → Pages → Branch: `main`
 https://topchurchtechs.github.io/elma-checkin/?serviceToken=你的TOKEN
 ```
 
-- 開啟後選擇班別
-- 將學生 QR Code 對準相機即自動簽到
+- 開啟後選擇**簽到**或**簽退**模式
+- 將學生 QR Code 對準相機即自動送出
 - URL 中的 `serviceToken` 讀取後會自動從網址列消失
 
-### QR Code 產生器（單筆，管理員使用）
+### QR Code 單筆產生器（管理員使用）
 
 ```
-https://topchurchtechs.github.io/elma-checkin/generate-qr-jwt.html?serviceToken=你的TOKEN
+https://topchurchtechs.github.io/elma-checkin/generate-qr-jwt.html
 ```
 
-- 填入學生 ID 與姓名即可產生 QR Code
-- 需要相同的 `serviceToken` 才能進入頁面
+- 填入學生 ID 與姓名即可產生單張 QR Code
+- 適合補發或測試個別學生識別碼
+
+### QR Code 批次產生器（管理員使用）
+
+```
+https://topchurchtechs.github.io/elma-checkin/generate-qr-batch.html
+```
+
+- 上傳 CSV 檔案，自動為每位學生產生識別卡
+- 可下載個別 PNG、打包 ZIP、或直接列印
+- 支援拖曳上傳，可自訂欄位對應
 
 ---
 
@@ -133,16 +141,9 @@ https://topchurchtechs.github.io/elma-checkin/generate-qr-jwt.html?serviceToken=
 
 ---
 
-## 批次產生學生 QR Code（Python 工具）
+## 批次產生學生 QR Code（瀏覽器工具）
 
-位於 `tools/` 目錄，從 CSV 一次產生所有學生的識別卡圖片。
-
-### 安裝依賴
-
-```bash
-cd tools
-pip3 install -r requirements.txt
-```
+開啟 `generate-qr-batch.html`，上傳 CSV 後即可在瀏覽器內直接產生識別卡，不需安裝任何軟體。
 
 ### CSV 格式
 
@@ -153,33 +154,70 @@ S002,李大華
 S003,陳美玲
 ```
 
-參考範本：`tools/students_example.csv`
-
-### 用法
-
-```bash
-# 基本用法：產生個別 PNG
-python3 generate_qrcodes.py students.csv
-
-# 指定輸出目錄
-python3 generate_qrcodes.py students.csv -o output
-
-# 額外產生可列印的拼版圖（sheet.png）
-python3 generate_qrcodes.py students.csv --sheet
-
-# 拼版改為每列 4 張
-python3 generate_qrcodes.py students.csv --sheet --cols 4
-
-# CSV 欄位名稱不同時指定
-python3 generate_qrcodes.py students.csv --id-col 學號 --name-col 姓名
-```
+- 第一列為標題列，欄位名稱可自訂（上傳後可在網頁上選擇對應欄位）
+- 預設以第 1 欄為學號、第 2 欄為姓名
 
 ### 輸出
 
-| 檔案 | 說明 |
+| 操作 | 說明 |
 |------|------|
-| `qrcodes/{id}_{name}.png` | 每位學生的個別識別卡 |
-| `qrcodes/sheet.png` | 拼版圖（加 `--sheet` 才產生） |
+| 點擊識別卡 | 下載單張 PNG |
+| 下載全部 ZIP | 打包所有識別卡為 `elma-qrcodes.zip` |
+| 列印 | 觸發瀏覽器列印，自動排版為 3 欄格式 |
+
+---
+
+## 請假申請設定（leave.html）
+
+`leave.html` 使用獨立的 Google 表單，與點名系統無關，不需要 serviceToken。
+
+### 步驟一：新建 Google 表單
+
+1. 建立一份新的 Google 表單，加入以下 **4 個欄位**：
+
+   | 欄位標題 | 類型 | 說明 |
+   |----------|------|------|
+   | `id` | 簡答 | 學生 ID |
+   | `reason` | 段落 | 請假原因 |
+   | `mentor` | 簡答 | 是否已知會導師（`是` 或 `否`） |
+   | `supervisor` | 簡答 | 是否已知會主管（`是` 或 `否`，實習生填寫） |
+
+2. 點選右上角三點選單 → **建立回應試算表**
+
+3. 取得各欄位的 `entry ID`：
+   - 點選 **眼睛圖示**（預覽表單）
+   - 右上角三點選單 → **取得預填連結**
+   - 每個欄位各填一個值 → 點「取得連結」
+   - 從網址找出 `entry.XXXXXXXXXX=` 的數字部分
+
+### 步驟二：修改 `leave.html`
+
+找到檔案頂部的 `CONFIG` 區塊，填入剛才取得的資訊：
+
+```js
+const CONFIG = {
+  formAction: "https://docs.google.com/forms/d/e/YOUR_LEAVE_FORM_ID/formResponse",
+  fields: {
+    id:         "entry.XXXXXXXXXX",
+    reason:     "entry.XXXXXXXXXX",
+    mentor:     "entry.XXXXXXXXXX",
+    supervisor: "entry.XXXXXXXXXX",
+  },
+};
+```
+
+### 使用方式
+
+直接開啟（不需帶任何參數）：
+
+```
+https://topchurchtechs.github.io/elma-checkin/leave.html
+```
+
+- 點「掃描 QR Code」展開相機 → 掃學生 QR Code → 自動填入學號，並顯示姓名確認
+- 也可直接手動輸入學號
+- 填寫請假原因、勾選是否已知會導師與主管
+- 按「送出請假申請」後，Google Sheet 會新增一筆記錄
 
 ---
 
@@ -194,5 +232,5 @@ QR Code 內容為 JWT 格式，payload 需包含：
 }
 ```
 
-> `generate-qr-jwt.html` 產生的為**無簽章 JWT**，僅供測試。
+> `generate-qr-jwt.html` 與 `generate-qr-batch.html` 產生的為**無簽章 JWT**，僅供測試。
 > 正式環境建議在後端用 `HS256` 簽署後再印製學生識別證。

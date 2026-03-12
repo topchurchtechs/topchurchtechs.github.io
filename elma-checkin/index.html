@@ -254,7 +254,6 @@
 
       fields: {
         id:           "entry.53447751",
-        name:         "entry.1725579977",
         type:         "entry.533664326",
         serviceToken: "entry.1828026802",
       },
@@ -296,7 +295,7 @@
     }
 
     // ─── Google 表單提交（hidden iframe，繞過 CORS） ────────────────────────────
-    function submitToGoogleForm(id, name) {
+    function submitToGoogleForm(id) {
       const form = document.createElement("form");
       form.method = "POST";
       form.action = CONFIG.formAction;
@@ -304,7 +303,6 @@
 
       const data = {
         [CONFIG.fields.id]:           id,
-        [CONFIG.fields.name]:         name,
         [CONFIG.fields.type]:         currentType,
         [CONFIG.fields.serviceToken]: SERVICE_TOKEN,
       };
@@ -429,7 +427,7 @@
       wrapper.classList.add("flash");
       wrapper.addEventListener("animationend", () => wrapper.classList.remove("flash"), { once: true });
 
-      submitToGoogleForm(id, name);
+      submitToGoogleForm(id);
       showToast(`✅ ${name} ${currentType}成功`, "success");
       addLog(name, id, "ok");
     }
