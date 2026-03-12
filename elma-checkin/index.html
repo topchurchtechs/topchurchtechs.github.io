@@ -16,7 +16,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       padding: 1rem;
     }
 
@@ -24,8 +23,10 @@
       display: none;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 1rem;
       text-align: center;
+      flex: 1;
     }
     #error-screen .icon { font-size: 3rem; }
     #error-screen h2 { color: #f87171; font-size: 1.4rem; }
@@ -35,29 +36,29 @@
       display: none;
       flex-direction: column;
       align-items: center;
-      gap: 1.25rem;
+      gap: 1rem;
       width: 100%;
-      max-width: 420px;
+      /* 手機：全寬；桌機：不超過視窗高度換算出的正方形寬度 */
+      max-width: min(100%, calc(100dvh - 220px));
     }
 
-    header {
-      text-align: center;
-    }
-    header h1 { font-size: 1.5rem; font-weight: 700; }
+    header { text-align: center; }
+    header h1 { font-size: 2rem; font-weight: 700; }
+
     .type-toggle {
       display: flex;
-      margin-top: 0.5rem;
+      margin-top: 0.6rem;
       background: #1e293b;
       border-radius: 99px;
-      padding: 3px;
-      gap: 2px;
+      padding: 4px;
+      gap: 3px;
     }
     .type-toggle button {
       flex: 1;
-      padding: 0.3rem 1.1rem;
+      padding: 0.5rem 1.75rem;
       border: none;
       border-radius: 99px;
-      font-size: 0.9rem;
+      font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
       background: transparent;
@@ -84,7 +85,6 @@
       display: block;
     }
 
-    /* scanning frame overlay */
     .scan-overlay {
       position: absolute;
       inset: 0;
@@ -109,15 +109,14 @@
       border-color: #38bdf8;
       border-style: solid;
     }
-    .scan-frame::before      { top: 0;    left: 0;  border-width: 3px 0 0 3px; }
-    .scan-frame::after       { top: 0;    right: 0; border-width: 3px 3px 0 0; }
+    .scan-frame::before        { top: 0;    left: 0;  border-width: 3px 0 0 3px; }
+    .scan-frame::after         { top: 0;    right: 0; border-width: 3px 3px 0 0; }
     .scan-frame > span::before { bottom: 0; left: 0;  border-width: 0 0 3px 3px; }
     .scan-frame > span::after  { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
 
     .scan-line {
       position: absolute;
-      left: 5%;
-      right: 5%;
+      left: 5%; right: 5%;
       height: 2px;
       background: linear-gradient(90deg, transparent, #38bdf8, transparent);
       animation: scan 2s ease-in-out infinite;
@@ -129,7 +128,6 @@
       100% { top: 90%; opacity: 0; }
     }
 
-    /* flash when QR detected */
     .camera-wrapper.flash::after {
       content: "";
       position: absolute;
@@ -138,43 +136,14 @@
       animation: flash 0.3s ease-out forwards;
       pointer-events: none;
     }
-    @keyframes flash {
-      from { opacity: 1; }
-      to   { opacity: 0; }
-    }
+    @keyframes flash { from { opacity: 1; } to { opacity: 0; } }
 
     .hint {
-      font-size: 0.85rem;
+      font-size: 1rem;
       color: #64748b;
       text-align: center;
     }
 
-    /* toast notification */
-    #toast {
-      position: fixed;
-      bottom: 1.5rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(6rem);
-      min-width: 260px;
-      max-width: 90vw;
-      padding: 0.9rem 1.25rem;
-      border-radius: 0.75rem;
-      font-size: 0.95rem;
-      text-align: center;
-      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 100;
-    }
-    #toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
-    #toast.success { background: #166534; color: #bbf7d0; border: 1px solid #22c55e; }
-    #toast.error   { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
-    #toast.info    { background: #1e3a5f; color: #bae6fd; border: 1px solid #38bdf8; }
-
-    /* log list */
     #log-list {
       width: 100%;
       max-height: 220px;
@@ -197,8 +166,8 @@
       gap: 0.75rem;
       background: #1e293b;
       border-radius: 0.6rem;
-      padding: 0.6rem 0.9rem;
-      font-size: 0.88rem;
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
       border-left: 3px solid #22c55e;
       animation: slideIn 0.3s ease-out;
     }
@@ -209,9 +178,30 @@
       to   { opacity: 1; transform: translateY(0); }
     }
     .log-item .name { font-weight: 600; color: #e2e8f0; flex: 1; }
-    .log-item .time { color: #64748b; font-size: 0.78rem; white-space: nowrap; }
+    .log-item .tag  { font-size: 0.85rem; color: #94a3b8; background: #0f172a; border-radius: 4px; padding: 2px 7px; }
+    .log-item .time { color: #64748b; font-size: 0.9rem; white-space: nowrap; }
 
-    /* hidden iframe for form submission */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(6rem);
+      min-width: 260px;
+      max-width: 90vw;
+      padding: 0.9rem 1.25rem;
+      border-radius: 0.75rem;
+      font-size: 1.05rem;
+      text-align: center;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    #toast.success { background: #166534; color: #bbf7d0; border: 1px solid #22c55e; }
+    #toast.error   { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+    #toast.info    { background: #1e3a5f; color: #bae6fd; border: 1px solid #38bdf8; }
+
     #submit-frame { display: none; }
   </style>
 </head>
@@ -357,7 +347,8 @@
       const now  = new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
       const item = document.createElement("div");
       item.className = `log-item ${type === "dup" ? "dup" : type === "err" ? "err" : ""}`;
-      item.innerHTML = `<span class="name">${escHtml(name)}</span><span class="time">${now}</span>`;
+      const tag = type === "ok" ? `<span class="tag">${escHtml(currentType)}</span>` : "";
+      item.innerHTML = `<span class="name">${escHtml(name)}</span>${tag}<span class="time">${now}</span>`;
       list.prepend(item);
     }
 
