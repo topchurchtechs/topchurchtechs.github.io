@@ -100,6 +100,17 @@ GitHub Pages 設定：repo → Settings → Pages → Branch: `main`
 
 ---
 
+## 頁面路由
+
+| 路由 | 說明 | 使用者 |
+|------|------|--------|
+| `/elma-checkin/` | 點名頁面 | 老師 |
+| `/elma-checkin/generate-qr-jwt.html` | 單筆 QR Code 產生器 | 管理員 |
+
+所有頁面皆需帶 `?serviceToken=TOKEN` 才能進入，否則顯示錯誤畫面。
+
+---
+
 ## 使用方式
 
 ### 點名頁面（老師使用）
@@ -112,7 +123,7 @@ https://topchurchtechs.github.io/elma-checkin/?serviceToken=你的TOKEN
 - 將學生 QR Code 對準相機即自動簽到
 - URL 中的 `serviceToken` 讀取後會自動從網址列消失
 
-### QR Code 產生器（製作學生識別碼）
+### QR Code 產生器（單筆，管理員使用）
 
 ```
 https://topchurchtechs.github.io/elma-checkin/generate-qr-jwt.html?serviceToken=你的TOKEN
