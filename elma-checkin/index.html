@@ -242,21 +242,14 @@
   </div>
 
   <div id="toast"></div>
-  <iframe id="submit-frame" name="submit-frame"></iframe>
 
   <canvas id="qr-canvas" style="display:none"></canvas>
 
   <script>
-    // ─── 設定區（請依 Google 表單修改） ────────────────────────────────────────
+    // ─── 設定區 ────────────────────────────────────────────────────────────────
     const CONFIG = {
-      // Google 表單的 action URL（/formResponse 結尾）
-      formAction: "https://docs.google.com/forms/d/e/1FAIpQLSd9v4oRSHgh5iwqMwC3R_a6G58mt3WJ6GeiMfYA0zOci9wXOw/formResponse",
-
-      fields: {
-        id:           "entry.53447751",
-        type:         "entry.533664326",
-        serviceToken: "entry.1828026802",
-      },
+      // Apps Script Web App 部署 URL
+      scriptUrl: "https://script.google.com/macros/s/AKfycbws588quCukxxTLvZUYubb-YNfbjUp61BhVKcRxGnYkGlqhdHqfg92lybhHfiiZ3zoadg/exec",
 
       // 同一個 QR Code 的冷卻時間（毫秒），防止重複提交
       cooldownMs: 5000,
@@ -294,30 +287,14 @@
       return JSON.parse(new TextDecoder().decode(bytes));
     }
 
-    // ─── Google 表單提交（hidden iframe，繞過 CORS） ────────────────────────────
-    function submitToGoogleForm(id) {
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = CONFIG.formAction;
-      form.target = "submit-frame";
-
-      const data = {
-        [CONFIG.fields.id]:           id,
-        [CONFIG.fields.type]:         currentType,
-        [CONFIG.fields.serviceToken]: SERVICE_TOKEN,
-      };
-
-      for (const [key, value] of Object.entries(data)) {
-        const input = document.createElement("input");
-        input.type  = "hidden";
-        input.name  = key;
-        input.value = value ?? "";
-        form.appendChild(input);
-      }
-
-      document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
+    // ─── Apps Script 提交 ─────────────────────────────────────────────────────
+    async function submitCheckin(id, name) {
+      const res = await fetch(CONFIG.scriptUrl, {
+        method: "POST",
+        body: JSON.stringify({ action: "checkin", id, type: currentType, serviceToken: SERVICE_TOKEN }),
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "伺服器錯誤");
     }
 
     // ─── 重複掃描防護 ──────────────────────────────────────────────────────────
@@ -427,9 +404,13 @@
       wrapper.classList.add("flash");
       wrapper.addEventListener("animationend", () => wrapper.classList.remove("flash"), { once: true });
 
-      submitToGoogleForm(id);
-      showToast(`✅ ${name} ${currentType}成功`, "success");
       addLog(name, id, "ok");
+      submitCheckin(id, name)
+        .then(() => showToast(`✅ ${name} ${currentType}成功`, "success"))
+        .catch(err => {
+          showToast(`❌ ${name} 送出失敗：${err.message}`, "error");
+          addLog(name, id, "err");
+        });
     }
   </script>
 </body>

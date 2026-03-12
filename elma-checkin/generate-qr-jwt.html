@@ -1,26 +1,101 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QR Code 產生器</title>
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #0f172a; color: #f1f5f9; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100dvh; padding: 2rem; gap: 1.5rem; }
-    h1 { font-size: 1.3rem; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-    #main-screen { display: flex-direction: column; align-items: center; gap: 1.5rem; width: 100%; max-width: 360px; }
-    .form { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; }
-    label { font-size: 0.85rem; color: #94a3b8; }
-    input { width: 100%; padding: 0.6rem 0.8rem; border-radius: 0.5rem; border: 1px solid #334155; background: #1e293b; color: #f1f5f9; font-size: 1rem; }
-    button { padding: 0.75rem; border-radius: 0.5rem; background: #2563eb; color: #fff; border: none; cursor: pointer; font-size: 1rem; }
-    button:hover { background: #1d4ed8; }
-    #qr-output { text-align: center; }
-    #qr-output canvas { border-radius: 0.75rem; }
-    code { font-size: 0.7rem; color: #7dd3fc; word-break: break-all; max-width: 360px; display: block; margin-top: 0.5rem; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #f1f5f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: 2rem;
+      gap: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+    }
+
+    #main-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border-radius: 0.5rem;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #f1f5f9;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    #qr-output {
+      text-align: center;
+    }
+
+    #qr-output canvas {
+      border-radius: 0.75rem;
+    }
+
+    code {
+      font-size: 0.7rem;
+      color: #7dd3fc;
+      word-break: break-all;
+      max-width: 360px;
+      display: block;
+      margin-top: 0.5rem;
+    }
   </style>
 </head>
+
 <body>
 
   <div id="main-screen">
@@ -28,7 +103,7 @@
 
     <div class="form">
       <label>學生 ID</label>
-      <input id="inp-id"   type="text" placeholder="e.g. S001" />
+      <input id="inp-id" type="text" placeholder="e.g. S001" />
       <label>學生姓名</label>
       <input id="inp-name" type="text" placeholder="e.g. 王小明" />
       <button onclick="generate()">產生 QR Code</button>
@@ -39,7 +114,7 @@
 
   <script>
     function makeUnsignedJWT(id, name) {
-      const header  = { alg: "none", typ: "JWT" };
+      const header = { alg: "none", typ: "JWT" };
       const payload = { id, name, iat: Math.floor(Date.now() / 1000) };
       const b64 = obj => {
         const bytes = new TextEncoder().encode(JSON.stringify(obj));
@@ -49,12 +124,12 @@
     }
 
     function generate() {
-      const id   = document.getElementById("inp-id").value.trim();
+      const id = document.getElementById("inp-id").value.trim();
       const name = document.getElementById("inp-name").value.trim();
       if (!id || !name) { alert("請填寫 ID 與姓名"); return; }
 
       const token = makeUnsignedJWT(id, name);
-      const out   = document.getElementById("qr-output");
+      const out = document.getElementById("qr-output");
       out.innerHTML = "";
 
       const canvas = document.createElement("canvas");
@@ -69,4 +144,5 @@
     }
   </script>
 </body>
+
 </html>

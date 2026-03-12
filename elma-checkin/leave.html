@@ -166,6 +166,68 @@
     .field textarea.error { border-color: #ef4444; }
     .field textarea { resize: vertical; min-height: 80px; }
 
+    /* 日期選擇器 */
+    .date-picker-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .date-nav-btn {
+      width: 2.5rem;
+      height: 2.75rem;
+      flex-shrink: 0;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      color: #94a3b8;
+      font-size: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .date-nav-btn:hover { background: #1e293b; color: #f1f5f9; }
+    .date-display {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      color: #f1f5f9;
+      font-size: 1rem;
+      padding: 0.65rem 0.875rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      transition: border-color 0.15s;
+    }
+    .date-display:hover { border-color: #475569; }
+    .date-display.error { border-color: #ef4444; }
+    .date-display .icon { opacity: 0.4; font-size: 0.9rem; }
+    .date-shortcuts {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .date-shortcuts button {
+      flex: 1;
+      padding: 0.4rem 0;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 0.4rem;
+      color: #64748b;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .date-shortcuts button:hover { background: #1e293b; color: #e2e8f0; }
+    .date-shortcuts button.active {
+      background: #0f2744;
+      color: #7dd3fc;
+      border-color: #38bdf8;
+    }
+
     /* 掃描後顯示的姓名提示 */
     #scanned-name {
       display: none;
@@ -288,6 +350,26 @@
       </div>
 
       <div class="field">
+        <label>請假日期</label>
+        <div class="date-picker-row">
+          <button type="button" class="date-nav-btn" onclick="shiftDate(-1)">‹</button>
+          <div class="date-display" id="date-display" onclick="openDatePicker()">
+            <span id="date-display-text">請選擇日期</span>
+            <span class="icon">📅</span>
+          </div>
+          <button type="button" class="date-nav-btn" onclick="shiftDate(1)">›</button>
+        </div>
+        <div class="date-shortcuts">
+          <button type="button" id="sc-today"    onclick="setDateOffset(0)">今天</button>
+          <button type="button" id="sc-tomorrow" onclick="setDateOffset(1)">明天</button>
+          <button type="button" id="sc-dat"      onclick="setDateOffset(2)">後天</button>
+        </div>
+        <input type="date" id="input-date" oninput="updateDateDisplay()"
+               style="position:absolute;opacity:0;width:0;height:0;pointer-events:none" />
+        <span class="error-msg" id="err-date">請選擇請假日期</span>
+      </div>
+
+      <div class="field">
         <label for="input-reason">請假原因</label>
         <textarea id="input-reason" placeholder="請簡述請假原因"></textarea>
         <span class="error-msg" id="err-reason">請填寫請假原因</span>
@@ -304,7 +386,7 @@
 
       <div class="field">
         <label>是否已知會主管</label>
-        <span class="field-note">（實習生填寫）</span>
+        <span class="field-note">（實習生填寫，選填）</span>
         <div class="yn-toggle">
           <button id="yn-supervisor-yes" onclick="selectYN('supervisor', '是')">是</button>
           <button id="yn-supervisor-no"  onclick="selectYN('supervisor', '否')">否</button>
@@ -317,21 +399,69 @@
   </div>
 
   <div id="toast"></div>
-  <iframe id="submit-frame" name="submit-frame"></iframe>
   <canvas id="qr-canvas" style="display:none"></canvas>
 
   <script>
     // ─── 設定區 ────────────────────────────────────────────────────────────────
     const CONFIG = {
-      formAction: "https://docs.google.com/forms/d/e/1FAIpQLSdAU2rU3AejnrdR5qMYfzDXxcfdlxeIa2usLHr-bJmkdtBKfA/formResponse",
-      fields: {
-        id:         "entry.558259535",
-        reason:     "entry.1711275962",
-        mentor:     "entry.1739851223",
-        supervisor: "entry.1976005869",
-      },
+      // Apps Script Web App 部署 URL
+      scriptUrl: "https://script.google.com/macros/s/AKfycbws588quCukxxTLvZUYubb-YNfbjUp61BhVKcRxGnYkGlqhdHqfg92lybhHfiiZ3zoadg/exec",
     };
     // ───────────────────────────────────────────────────────────────────────────
+
+    // ─── 日期選擇器 ────────────────────────────────────────────────────────────
+    const WEEK_DAYS = ["日", "一", "二", "三", "四", "五", "六"];
+
+    function getToday() {
+      const d = new Date();
+      return localDateStr(d);
+    }
+    function localDateStr(d) {
+      const y  = d.getFullYear();
+      const m  = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${dd}`;
+    }
+    function offsetDate(dateStr, delta) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      const date = new Date(y, m - 1, d);
+      date.setDate(date.getDate() + delta);
+      return localDateStr(date);
+    }
+    function setDate(dateStr) {
+      document.getElementById("input-date").value = dateStr;
+      updateDateDisplay();
+    }
+    function setDateOffset(delta) { setDate(offsetDate(getToday(), delta)); }
+    function shiftDate(delta) {
+      const cur = document.getElementById("input-date").value || getToday();
+      setDate(offsetDate(cur, delta));
+    }
+    function openDatePicker() {
+      const input = document.getElementById("input-date");
+      try { input.showPicker(); } catch { input.click(); }
+    }
+    function updateDateDisplay() {
+      const val  = document.getElementById("input-date").value;
+      const today    = getToday();
+      const tomorrow = offsetDate(today, 1);
+      const dat      = offsetDate(today, 2);
+
+      if (val) {
+        const d = new Date(val + "T00:00:00");
+        document.getElementById("date-display-text").textContent =
+          `${d.getMonth() + 1}月${d.getDate()}日（${WEEK_DAYS[d.getDay()]}）`;
+        document.getElementById("date-display").classList.remove("error");
+        document.getElementById("err-date").classList.remove("show");
+      }
+
+      document.getElementById("sc-today").classList.toggle("active",    val === today);
+      document.getElementById("sc-tomorrow").classList.toggle("active", val === tomorrow);
+      document.getElementById("sc-dat").classList.toggle("active",      val === dat);
+    }
+
+    // 預設今天
+    setDate(getToday());
 
     // 是/否 選擇狀態
     const yn = { mentor: null, supervisor: null };
@@ -481,6 +611,7 @@
       let valid = true;
 
       const idEl     = document.getElementById("input-id");
+      const dateEl   = document.getElementById("input-date");
       const reasonEl = document.getElementById("input-reason");
 
       if (!idEl.value.trim()) {
@@ -490,6 +621,15 @@
       } else {
         idEl.classList.remove("error");
         document.getElementById("err-id").classList.remove("show");
+      }
+
+      if (!dateEl.value) {
+        document.getElementById("date-display").classList.add("error");
+        document.getElementById("err-date").classList.add("show");
+        valid = false;
+      } else {
+        document.getElementById("date-display").classList.remove("error");
+        document.getElementById("err-date").classList.remove("show");
       }
 
       if (!reasonEl.value.trim()) {
@@ -506,61 +646,46 @@
         valid = false;
       }
 
-      if (!yn.supervisor) {
-        document.getElementById("err-supervisor").classList.add("show");
-        valid = false;
-      }
-
       if (!valid) return;
 
-      submitToGoogleForm(
-        idEl.value.trim(),
-        reasonEl.value.trim(),
-        yn.mentor,
-        yn.supervisor
-      );
+      // 送出中狀態
+      const btn = document.getElementById("btn-submit");
+      btn.disabled    = true;
+      btn.textContent = "送出中…";
 
-      showToast("✅ 請假申請已送出", "success");
-
-      // 清空表單
-      idEl.value     = "";
-      reasonEl.value = "";
-      document.getElementById("scanned-name").classList.remove("show");
-      resetYN("mentor");
-      resetYN("supervisor");
+      fetch(CONFIG.scriptUrl, {
+        method: "POST",
+        body: JSON.stringify({
+          action:     "leave",
+          id:         idEl.value.trim(),
+          date:       dateEl.value,
+          reason:     reasonEl.value.trim(),
+          mentor:     yn.mentor,
+          supervisor: yn.supervisor,
+        }),
+      })
+        .then(r => r.json())
+        .then(json => {
+          if (!json.ok) throw new Error(json.error ?? "伺服器錯誤");
+          showToast("✅ 請假申請已送出", "success");
+          idEl.value     = "";
+          setDate(getToday());
+          reasonEl.value = "";
+          document.getElementById("scanned-name").classList.remove("show");
+          resetYN("mentor");
+          resetYN("supervisor");
+        })
+        .catch(err => showToast(`❌ 送出失敗：${err.message}`, "error"))
+        .finally(() => {
+          btn.disabled    = false;
+          btn.textContent = "送出請假申請";
+        });
     }
 
     function resetYN(group) {
       yn[group] = null;
       document.getElementById(`yn-${group}-yes`).className = "";
       document.getElementById(`yn-${group}-no`).className  = "";
-    }
-
-    // ─── Google 表單提交（hidden iframe，繞過 CORS） ────────────────────────────
-    function submitToGoogleForm(id, reason, mentor, supervisor) {
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = CONFIG.formAction;
-      form.target = "submit-frame";
-
-      const data = {
-        [CONFIG.fields.id]:         id,
-        [CONFIG.fields.reason]:     reason,
-        [CONFIG.fields.mentor]:     mentor,
-        [CONFIG.fields.supervisor]: supervisor,
-      };
-
-      for (const [key, value] of Object.entries(data)) {
-        const input = document.createElement("input");
-        input.type  = "hidden";
-        input.name  = key;
-        input.value = value ?? "";
-        form.appendChild(input);
-      }
-
-      document.body.appendChild(form);
-      form.submit();
-      document.body.removeChild(form);
     }
   </script>
 </body>
