@@ -34,8 +34,11 @@ function handleCheckin(body) {
     return respond(false, "缺少必要欄位（id, type）");
   }
 
-  const sheet = getOrCreateSheet(CONFIG.sheets.checkin, ["時間", "ID", "類型"]);
-  sheet.appendRow([new Date(), id, type]);
+  const now  = new Date();
+  const date = Utilities.formatDate(now, "Asia/Taipei", "yyyy-MM-dd");
+
+  const sheet = getOrCreateSheet(CONFIG.sheets.checkin, ["時間", "ID", "類型", "日期"]);
+  sheet.appendRow([now, id, type, date]);
 
   return respond(true);
 }

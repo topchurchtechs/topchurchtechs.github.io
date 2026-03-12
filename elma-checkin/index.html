@@ -288,10 +288,10 @@
     }
 
     // ─── Apps Script 提交 ─────────────────────────────────────────────────────
-    async function submitCheckin(id, name) {
+    async function submitCheckin(id, name, type) {
       const res = await fetch(CONFIG.scriptUrl, {
         method: "POST",
-        body: JSON.stringify({ action: "checkin", id, type: currentType, serviceToken: SERVICE_TOKEN }),
+        body: JSON.stringify({ action: "checkin", id, type, serviceToken: SERVICE_TOKEN }),
       });
       const json = await res.json();
       if (!json.ok) throw new Error(json.error ?? "伺服器錯誤");
@@ -317,13 +317,13 @@
     }
 
     // ─── 記錄清單 ──────────────────────────────────────────────────────────────
-    function addLog(name, id, type = "ok") {
+    function addLog(name, id, status = "ok", scanType = "") {
       const list = document.getElementById("log-list");
       const now  = new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
       const item = document.createElement("div");
-      item.className = `log-item ${type === "dup" ? "dup" : type === "err" ? "err" : ""}`;
-      const tag = type === "ok" ? `<span class="tag">${escHtml(currentType)}</span>` : "";
-      item.innerHTML = `<span class="name">${escHtml(name)}</span>${tag}<span class="time">${now}</span>`;
+      item.className = `log-item ${status === "dup" ? "dup" : status === "err" ? "err" : ""}`;
+      const tag = status === "ok" ? `<span class="tag">${escHtml(scanType)}</span>` : "";
+      item.innerHTML = `<span class="name">${escHtml(name)}</span><span class="tag">${escHtml(id)}</span>${tag}<span class="time">${now}</span>`;
       list.prepend(item);
     }
 
@@ -397,6 +397,8 @@
 
       scannedCodes.set(id, Date.now());
 
+      const scannedType = currentType; // 掃描當下鎖定，後續切換不影響
+
       // 視覺回饋
       const wrapper = document.getElementById("camera-wrapper");
       wrapper.classList.remove("flash");
@@ -404,12 +406,14 @@
       wrapper.classList.add("flash");
       wrapper.addEventListener("animationend", () => wrapper.classList.remove("flash"), { once: true });
 
-      addLog(name, id, "ok");
-      submitCheckin(id, name)
-        .then(() => showToast(`✅ ${name} ${currentType}成功`, "success"))
+      submitCheckin(id, name, scannedType)
+        .then(() => {
+          addLog(name, id, "ok", scannedType);
+          showToast(`✅ ${name} ${scannedType}成功`, "success");
+        })
         .catch(err => {
+          addLog(name, id, "err", scannedType);
           showToast(`❌ ${name} 送出失敗：${err.message}`, "error");
-          addLog(name, id, "err");
         });
     }
   </script>
