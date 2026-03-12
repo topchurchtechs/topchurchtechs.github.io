@@ -133,6 +133,56 @@ https://topchurchtechs.github.io/elma-checkin/generate-qr-jwt.html?serviceToken=
 
 ---
 
+## 批次產生學生 QR Code（Python 工具）
+
+位於 `tools/` 目錄，從 CSV 一次產生所有學生的識別卡圖片。
+
+### 安裝依賴
+
+```bash
+cd tools
+pip3 install -r requirements.txt
+```
+
+### CSV 格式
+
+```csv
+id,name
+S001,王小明
+S002,李大華
+S003,陳美玲
+```
+
+參考範本：`tools/students_example.csv`
+
+### 用法
+
+```bash
+# 基本用法：產生個別 PNG
+python3 generate_qrcodes.py students.csv
+
+# 指定輸出目錄
+python3 generate_qrcodes.py students.csv -o output
+
+# 額外產生可列印的拼版圖（sheet.png）
+python3 generate_qrcodes.py students.csv --sheet
+
+# 拼版改為每列 4 張
+python3 generate_qrcodes.py students.csv --sheet --cols 4
+
+# CSV 欄位名稱不同時指定
+python3 generate_qrcodes.py students.csv --id-col 學號 --name-col 姓名
+```
+
+### 輸出
+
+| 檔案 | 說明 |
+|------|------|
+| `qrcodes/{id}_{name}.png` | 每位學生的個別識別卡 |
+| `qrcodes/sheet.png` | 拼版圖（加 `--sheet` 才產生） |
+
+---
+
 ## 學生 QR Code 規格
 
 QR Code 內容為 JWT 格式，payload 需包含：
