@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>點名系統</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f172a;
+      color: #f1f5f9;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #error-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      text-align: center;
+    }
+    #error-screen .icon { font-size: 3rem; }
+    #error-screen h2 { color: #f87171; font-size: 1.4rem; }
+    #error-screen p { color: #94a3b8; font-size: 0.9rem; line-height: 1.6; }
+
+    #main-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    header {
+      text-align: center;
+    }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
+    header .class-badge {
+      display: inline-block;
+      margin-top: 0.4rem;
+      padding: 0.2rem 0.75rem;
+      background: #1e40af;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      color: #bfdbfe;
+    }
+
+    .camera-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      background: #1e293b;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 2px solid #334155;
+    }
+
+    #camera-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* scanning frame overlay */
+    .scan-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .scan-frame {
+      width: 60%;
+      aspect-ratio: 1;
+      position: relative;
+    }
+    .scan-frame::before,
+    .scan-frame::after,
+    .scan-frame > span::before,
+    .scan-frame > span::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-color: #38bdf8;
+      border-style: solid;
+    }
+    .scan-frame::before      { top: 0;    left: 0;  border-width: 3px 0 0 3px; }
+    .scan-frame::after       { top: 0;    right: 0; border-width: 3px 3px 0 0; }
+    .scan-frame > span::before { bottom: 0; left: 0;  border-width: 0 0 3px 3px; }
+    .scan-frame > span::after  { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
+
+    .scan-line {
+      position: absolute;
+      left: 5%;
+      right: 5%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+      animation: scan 2s ease-in-out infinite;
+      top: 10%;
+    }
+    @keyframes scan {
+      0%   { top: 10%; opacity: 1; }
+      90%  { top: 90%; opacity: 1; }
+      100% { top: 90%; opacity: 0; }
+    }
+
+    /* flash when QR detected */
+    .camera-wrapper.flash::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.35);
+      animation: flash 0.3s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes flash {
+      from { opacity: 1; }
+      to   { opacity: 0; }
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      color: #64748b;
+      text-align: center;
+    }
+
+    /* toast notification */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(6rem);
+      min-width: 260px;
+      max-width: 90vw;
+      padding: 0.9rem 1.25rem;
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+      text-align: center;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+    }
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+    #toast.success { background: #166534; color: #bbf7d0; border: 1px solid #22c55e; }
+    #toast.error   { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
+    #toast.info    { background: #1e3a5f; color: #bae6fd; border: 1px solid #38bdf8; }
+
+    /* log list */
+    #log-list {
+      width: 100%;
+      max-height: 220px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    #log-list:empty::after {
+      content: "尚無掃描記錄";
+      display: block;
+      text-align: center;
+      color: #475569;
+      font-size: 0.85rem;
+      padding: 1rem 0;
+    }
+    .log-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #1e293b;
+      border-radius: 0.6rem;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.88rem;
+      border-left: 3px solid #22c55e;
+      animation: slideIn 0.3s ease-out;
+    }
+    .log-item.dup { border-left-color: #f59e0b; }
+    .log-item.err { border-left-color: #ef4444; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .log-item .name { font-weight: 600; color: #e2e8f0; flex: 1; }
+    .log-item .time { color: #64748b; font-size: 0.78rem; white-space: nowrap; }
+
+    /* hidden iframe for form submission */
+    #submit-frame { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Error screen (missing params) -->
+  <div id="error-screen">
+    <div class="icon">⚠️</div>
+    <h2>缺少必要參數</h2>
+    <p>請以正確連結開啟本頁面，例如：<br>
+      <code style="color:#7dd3fc">?serviceToken=TOKEN&amp;class=CLASS_NAME</code>
+    </p>
+  </div>
+
+  <!-- Main screen -->
+  <div id="main-screen">
+    <header>
+      <h1>📋 點名系統</h1>
+      <span class="class-badge" id="class-label"></span>
+    </header>
+
+    <div class="camera-wrapper" id="camera-wrapper">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <div class="scan-overlay">
+        <div class="scan-frame">
+          <span></span>
+          <div class="scan-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint">將學生 QR Code 對準框內即可自動簽到</p>
+
+    <div id="log-list"></div>
+  </div>
+
+  <div id="toast"></div>
+  <iframe id="submit-frame" name="submit-frame"></iframe>
+
+  <canvas id="qr-canvas" style="display:none"></canvas>
+
+  <script>
+    // ─── 設定區（請依 Google 表單修改） ────────────────────────────────────────
+    const CONFIG = {
+      // Google 表單的 action URL（/formResponse 結尾）
+      formAction: "https://docs.google.com/forms/d/e/1FAIpQLSd9v4oRSHgh5iwqMwC3R_a6G58mt3WJ6GeiMfYA0zOci9wXOw/formResponse",
+
+      fields: {
+        id:           "entry.53447751",
+        name:         "entry.1725579977",
+        className:    "entry.2020719",
+        serviceToken: "entry.1828026802",
+      },
+
+      // 同一個 QR Code 的冷卻時間（毫秒），防止重複提交
+      cooldownMs: 5000,
+    };
+    // ───────────────────────────────────────────────────────────────────────────
+
+    // 讀取並隱藏 URL 參數
+    const urlParams = new URLSearchParams(window.location.search);
+    const SERVICE_TOKEN = urlParams.get("serviceToken");
+    const CLASS_NAME    = urlParams.get("class");
+    history.replaceState({}, document.title, window.location.pathname);
+
+    // 驗證參數
+    if (!SERVICE_TOKEN || !CLASS_NAME) {
+      document.getElementById("error-screen").style.display = "flex";
+    } else {
+      document.getElementById("main-screen").style.display = "flex";
+      document.getElementById("class-label").textContent = CLASS_NAME;
+      startCamera();
+    }
+
+    // ─── JWT 解析（僅 decode payload，不驗簽） ─────────────────────────────────
+    function decodeJWT(token) {
+      const parts = token.trim().split(".");
+      if (parts.length !== 3) throw new Error("不是有效的 JWT 格式");
+      const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+      const json = atob(base64.padEnd(base64.length + (4 - base64.length % 4) % 4, "="));
+      return JSON.parse(json);
+    }
+
+    // ─── Google 表單提交（hidden iframe，繞過 CORS） ────────────────────────────
+    function submitToGoogleForm(id, name) {
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = CONFIG.formAction;
+      form.target = "submit-frame";
+
+      const data = {
+        [CONFIG.fields.id]:           id,
+        [CONFIG.fields.name]:         name,
+        [CONFIG.fields.className]:    CLASS_NAME,
+        [CONFIG.fields.serviceToken]: SERVICE_TOKEN,
+      };
+
+      for (const [key, value] of Object.entries(data)) {
+        const input = document.createElement("input");
+        input.type  = "hidden";
+        input.name  = key;
+        input.value = value ?? "";
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+    }
+
+    // ─── 重複掃描防護 ──────────────────────────────────────────────────────────
+    const scannedCodes = new Map(); // id -> timestamp
+
+    function isDuplicate(id) {
+      const last = scannedCodes.get(id);
+      if (!last) return false;
+      return Date.now() - last < CONFIG.cooldownMs;
+    }
+
+    // ─── Toast 通知 ────────────────────────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg, type = "info") {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className = `show ${type}`;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = ""; }, 3000);
+    }
+
+    // ─── 記錄清單 ──────────────────────────────────────────────────────────────
+    function addLog(name, id, type = "ok") {
+      const list = document.getElementById("log-list");
+      const now  = new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const item = document.createElement("div");
+      item.className = `log-item ${type === "dup" ? "dup" : type === "err" ? "err" : ""}`;
+      item.innerHTML = `<span class="name">${escHtml(name)}</span><span class="time">${now}</span>`;
+      list.prepend(item);
+    }
+
+    function escHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+    }
+
+    // ─── 相機與 QR 掃描 ────────────────────────────────────────────────────────
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 1280 } }
+        });
+        const video = document.getElementById("camera-video");
+        video.srcObject = stream;
+        video.addEventListener("loadedmetadata", () => {
+          video.play();
+          requestAnimationFrame(scanLoop);
+        });
+      } catch (err) {
+        showToast("無法存取相機：" + err.message, "error");
+      }
+    }
+
+    const canvas = document.getElementById("qr-canvas");
+    const ctx    = canvas.getContext("2d", { willReadFrequently: true });
+    let lastCode = null;
+
+    function scanLoop() {
+      const video = document.getElementById("camera-video");
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width  = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const qr = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+
+        if (qr && qr.data && qr.data !== lastCode) {
+          lastCode = qr.data;
+          setTimeout(() => { lastCode = null; }, 1500); // 1.5s 同一碼靜默
+          handleQRCode(qr.data);
+        }
+      }
+      requestAnimationFrame(scanLoop);
+    }
+
+    function handleQRCode(raw) {
+      let payload;
+      try {
+        payload = decodeJWT(raw);
+      } catch {
+        showToast("無效的 QR Code 格式", "error");
+        addLog("（無法解析）", "—", "err");
+        return;
+      }
+
+      const { id, name } = payload;
+      if (!id || !name) {
+        showToast("QR Code 缺少 id 或 name 欄位", "error");
+        addLog(`id:${id} name:${name}`, "—", "err");
+        return;
+      }
+
+      if (isDuplicate(id)) {
+        showToast(`${name} 已重複掃描，請稍後再試`, "info");
+        addLog(name, id, "dup");
+        return;
+      }
+
+      scannedCodes.set(id, Date.now());
+
+      // 視覺回饋
+      const wrapper = document.getElementById("camera-wrapper");
+      wrapper.classList.remove("flash");
+      void wrapper.offsetWidth; // reflow
+      wrapper.classList.add("flash");
+      wrapper.addEventListener("animationend", () => wrapper.classList.remove("flash"), { once: true });
+
+      submitToGoogleForm(id, name);
+      showToast(`✅ ${name} 簽到成功`, "success");
+      addLog(name, id, "ok");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Code 產生器（測試用）</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #0f172a; color: #f1f5f9; display: flex; flex-direction: column; align-items: center; padding: 2rem; gap: 1.5rem; }
+    h1 { font-size: 1.3rem; }
+    .form { display: flex; flex-direction: column; gap: 0.75rem; width: 100%; max-width: 360px; }
+    label { font-size: 0.85rem; color: #94a3b8; }
+    input { width: 100%; padding: 0.6rem 0.8rem; border-radius: 0.5rem; border: 1px solid #334155; background: #1e293b; color: #f1f5f9; font-size: 1rem; }
+    button { padding: 0.75rem; border-radius: 0.5rem; background: #2563eb; color: #fff; border: none; cursor: pointer; font-size: 1rem; }
+    button:hover { background: #1d4ed8; }
+    #qr-output { text-align: center; }
+    #qr-output canvas { border-radius: 0.75rem; }
+    code { font-size: 0.7rem; color: #7dd3fc; word-break: break-all; max-width: 360px; display: block; margin-top: 0.5rem; }
+    .note { font-size: 0.8rem; color: #f59e0b; max-width: 360px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>🔑 學生 QR Code 產生器（測試用）</h1>
+  <p class="note">⚠️ 此頁面僅供測試。正式環境請在後端用私鑰簽署 JWT。</p>
+
+  <div class="form">
+    <label>學生 ID</label>
+    <input id="inp-id"   type="text" placeholder="e.g. S001" />
+    <label>學生姓名</label>
+    <input id="inp-name" type="text" placeholder="e.g. 王小明" />
+    <button onclick="generate()">產生 QR Code</button>
+  </div>
+
+  <div id="qr-output"></div>
+
+  <script>
+    /**
+     * 產生一個「未簽署」的 JWT（header.payload.）
+     * 注意：沒有真正的簽章，僅用於測試。
+     * 生產環境應在後端用 HS256 / RS256 簽署後再印出 QR Code。
+     */
+    function makeUnsignedJWT(id, name) {
+      const header  = { alg: "none", typ: "JWT" };
+      const payload = { id, name, iat: Math.floor(Date.now() / 1000) };
+      const b64 = obj => btoa(JSON.stringify(obj)).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+      return `${b64(header)}.${b64(payload)}.`;
+    }
+
+    function generate() {
+      const id   = document.getElementById("inp-id").value.trim();
+      const name = document.getElementById("inp-name").value.trim();
+      if (!id || !name) { alert("請填寫 ID 與姓名"); return; }
+
+      const token = makeUnsignedJWT(id, name);
+      const out   = document.getElementById("qr-output");
+      out.innerHTML = "";
+
+      const canvas = document.createElement("canvas");
+      out.appendChild(canvas);
+
+      QRCode.toCanvas(canvas, token, { width: 280, margin: 2, color: { dark: "#0f172a", light: "#f1f5f9" } }, err => {
+        if (err) { out.textContent = "產生失敗：" + err.message; return; }
+        const code = document.createElement("code");
+        code.textContent = token;
+        out.appendChild(code);
+      });
+    }
+  </script>
+</body>
+</html>
