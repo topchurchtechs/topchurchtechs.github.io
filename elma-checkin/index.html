@@ -203,6 +203,26 @@
     #toast.info    { background: #1e3a5f; color: #bae6fd; border: 1px solid #38bdf8; }
 
     #submit-frame { display: none; }
+
+    #camera-select-wrapper {
+      width: 100%;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #camera-select-wrapper.show { display: flex; }
+    #camera-select {
+      flex: 1;
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      outline: none;
+    }
+    #camera-select:focus { border-color: #38bdf8; }
   </style>
 </head>
 <body>
@@ -234,6 +254,11 @@
           <div class="scan-line"></div>
         </div>
       </div>
+    </div>
+
+    <div id="camera-select-wrapper">
+      <span style="color:#64748b;font-size:0.9rem;white-space:nowrap">📷 鏡頭</span>
+      <select id="camera-select" onchange="switchCamera(this.value)"></select>
     </div>
 
     <p class="hint">將學生 QR Code 對準框內即可自動簽到</p>
@@ -332,19 +357,62 @@
     }
 
     // ─── 相機與 QR 掃描 ────────────────────────────────────────────────────────
+    let currentStream = null;
+
     async function startCamera() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 1280 } }
+        // 先用 environment 取得權限並列出裝置
+        const initStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        initStream.getTracks().forEach(t => t.stop()); // 只是要觸發權限
+
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cameras = devices.filter(d => d.kind === "videoinput");
+
+        const sel = document.getElementById("camera-select");
+        sel.innerHTML = "";
+        cameras.forEach((cam, i) => {
+          const opt = document.createElement("option");
+          opt.value = cam.deviceId;
+          opt.textContent = cam.label || `鏡頭 ${i + 1}`;
+          sel.appendChild(opt);
         });
-        const video = document.getElementById("camera-video");
-        video.srcObject = stream;
-        video.addEventListener("loadedmetadata", () => {
-          video.play();
-          requestAnimationFrame(scanLoop);
-        });
+
+        // 優先選後鏡頭（label 含 back / environment / 後）
+        const backCam = cameras.find(c =>
+          /back|environment|後/i.test(c.label)
+        );
+        if (backCam) sel.value = backCam.deviceId;
+
+        // 多於一顆才顯示下拉
+        if (cameras.length > 1) {
+          document.getElementById("camera-select-wrapper").classList.add("show");
+        }
+
+        await openCamera(sel.value);
       } catch (err) {
         showToast("無法存取相機：" + err.message, "error");
+      }
+    }
+
+    async function openCamera(deviceId) {
+      if (currentStream) currentStream.getTracks().forEach(t => t.stop());
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 1280 } }
+      });
+      currentStream = stream;
+      const video = document.getElementById("camera-video");
+      video.srcObject = stream;
+      video.addEventListener("loadedmetadata", () => {
+        video.play();
+        requestAnimationFrame(scanLoop);
+      }, { once: true });
+    }
+
+    async function switchCamera(deviceId) {
+      try {
+        await openCamera(deviceId);
+      } catch (err) {
+        showToast("切換鏡頭失敗：" + err.message, "error");
       }
     }
 

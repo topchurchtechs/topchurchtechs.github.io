@@ -318,6 +318,26 @@
     #toast.info    { background: #1e3a5f; color: #bae6fd; border: 1px solid #38bdf8; }
 
     #submit-frame { display: none; }
+
+    #camera-select-wrapper {
+      display: none;
+      width: 100%;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #camera-select-wrapper.show { display: flex; }
+    #camera-select {
+      flex: 1;
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      outline: none;
+    }
+    #camera-select:focus { border-color: #38bdf8; }
   </style>
 </head>
 <body>
@@ -329,6 +349,10 @@
 
     <!-- 相機區 -->
     <button id="btn-camera" onclick="toggleCamera()">📷 掃描 QR Code</button>
+    <div id="camera-select-wrapper">
+      <span style="color:#64748b;font-size:0.9rem;white-space:nowrap">📷 鏡頭</span>
+      <select id="camera-select" onchange="switchCamera(this.value)"></select>
+    </div>
     <div class="camera-wrapper" id="camera-wrapper">
       <video id="camera-video" autoplay playsinline muted></video>
       <div class="scan-overlay">
@@ -518,6 +542,7 @@
         cameraStream = null;
       }
       document.getElementById("camera-wrapper").classList.remove("open");
+      document.getElementById("camera-select-wrapper").classList.remove("show");
       const btn = document.getElementById("btn-camera");
       btn.classList.remove("active");
       btn.textContent = "📷 掃描 QR Code";
@@ -525,19 +550,59 @@
 
     async function startCamera() {
       try {
-        cameraStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 1280 } }
+        // 先取得權限，再列舉鏡頭
+        const initStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        initStream.getTracks().forEach(t => t.stop());
+
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cameras = devices.filter(d => d.kind === "videoinput");
+
+        const sel = document.getElementById("camera-select");
+        sel.innerHTML = "";
+        cameras.forEach((cam, i) => {
+          const opt = document.createElement("option");
+          opt.value = cam.deviceId;
+          opt.textContent = cam.label || `鏡頭 ${i + 1}`;
+          sel.appendChild(opt);
         });
-        const video = document.getElementById("camera-video");
-        video.srcObject = cameraStream;
-        video.addEventListener("loadedmetadata", () => {
-          video.play();
-          scanning = true;
-          requestAnimationFrame(scanLoop);
-        }, { once: true });
+
+        // 優先選後鏡頭
+        const backCam = cameras.find(c => /back|environment|後/i.test(c.label));
+        if (backCam) sel.value = backCam.deviceId;
+
+        // 多於一顆才顯示下拉
+        if (cameras.length > 1) {
+          document.getElementById("camera-select-wrapper").classList.add("show");
+        }
+
+        await openCamera(sel.value);
       } catch (err) {
         closeCamera();
         showToast("無法存取相機：" + err.message, "error");
+      }
+    }
+
+    async function openCamera(deviceId) {
+      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: { deviceId: { exact: deviceId }, width: { ideal: 1280 }, height: { ideal: 1280 } }
+      });
+      const video = document.getElementById("camera-video");
+      video.srcObject = cameraStream;
+      video.addEventListener("loadedmetadata", () => {
+        video.play();
+        scanning = true;
+        requestAnimationFrame(scanLoop);
+      }, { once: true });
+    }
+
+    async function switchCamera(deviceId) {
+      scanning = false;
+      try {
+        await openCamera(deviceId);
+        scanning = true;
+      } catch (err) {
+        showToast("切換鏡頭失敗：" + err.message, "error");
       }
     }
 
