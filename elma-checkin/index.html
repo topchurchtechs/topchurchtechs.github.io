@@ -19,7 +19,7 @@
       padding: 1rem;
     }
 
-    #error-screen {
+    #error-screen, #line-screen {
       display: none;
       flex-direction: column;
       align-items: center;
@@ -28,9 +28,53 @@
       text-align: center;
       flex: 1;
     }
-    #error-screen .icon { font-size: 3rem; }
+    #error-screen .icon, #line-screen .icon { font-size: 3rem; }
     #error-screen h2 { color: #f87171; font-size: 1.4rem; }
-    #error-screen p { color: #6b7a9b; font-size: 0.9rem; line-height: 1.6; }
+    #error-screen p  { color: #6b7a9b; font-size: 0.9rem; line-height: 1.6; }
+
+    #line-screen h2 { color: #1e2a5e; font-size: 1.4rem; }
+    #line-screen p  { color: #6b7a9b; font-size: 0.9rem; line-height: 1.6; max-width: 320px; }
+    #line-screen .btn-primary {
+      margin-top: 0.5rem;
+      width: 100%;
+      max-width: 320px;
+      padding: 0.9rem;
+      background: #1d4ed8;
+      color: #fff;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    #line-screen .btn-secondary {
+      width: 100%;
+      max-width: 320px;
+      padding: 0.75rem;
+      background: #e8edf8;
+      color: #4b5580;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* 拍照模式按鈕（LINE 留在內建瀏覽器時使用） */
+    #photo-scan-btn {
+      display: none;
+      width: 100%;
+      padding: 1.1rem;
+      background: #1d4ed8;
+      color: #fff;
+      border: none;
+      border-radius: 1rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.03em;
+    }
+    #photo-scan-btn.show { display: block; }
 
     #main-screen {
       display: none;
@@ -240,6 +284,15 @@
 </head>
 <body>
 
+  <!-- LINE Android screen -->
+  <div id="line-screen">
+    <div class="icon">🌐</div>
+    <h2>請用外部瀏覽器開啟</h2>
+    <p>LINE 內建瀏覽器無法存取相機進行連續掃描。<br>建議點下方按鈕在 Chrome 中開啟，掃描體驗最佳。</p>
+    <button class="btn-primary" onclick="openInChrome()">在 Chrome 開啟</button>
+    <button class="btn-secondary" onclick="usePhotoMode()">留在 LINE（每次拍照掃描）</button>
+  </div>
+
   <!-- Error screen (missing params) -->
   <div id="error-screen">
     <div class="icon">⚠️</div>
@@ -281,6 +334,8 @@
       <select id="camera-select" onchange="switchCamera(this.value)"></select>
     </div>
 
+    <button id="photo-scan-btn" onclick="triggerPhotoScan()">📷 點擊拍照掃描 QR Code</button>
+
     <p class="hint">將學生 QR Code 對準框內即可自動簽到</p>
 
     <div id="log-list"></div>
@@ -289,6 +344,7 @@
   <div id="toast"></div>
 
   <canvas id="qr-canvas" style="display:none"></canvas>
+  <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoFile(this)">
 
   <script>
     // ─── 設定區 ────────────────────────────────────────────────────────────────
@@ -314,9 +370,62 @@
       document.getElementById("btn-checkout").className = type === "簽退" ? "active-checkout" : "";
     }
 
+    // ─── LINE / Android 偵測 ────────────────────────────────────────────────────
+    const UA = navigator.userAgent;
+    const isLineApp  = /Line\//i.test(UA);
+    const isAndroid  = /Android/i.test(UA);
+    const isLineAndroid = isLineApp && isAndroid;
+
+    function openInChrome() {
+      // intent:// 讓 Android 直接用 Chrome 開啟，並把 serviceToken 帶回去
+      const target = `${location.origin}${location.pathname}?serviceToken=${SERVICE_TOKEN}`;
+      location.href = `intent://${target.replace(/^https?:\/\//, "")}` +
+                      `#Intent;scheme=https;package=com.android.chrome;` +
+                      `S.browser_fallback_url=${encodeURIComponent(target)};end`;
+    }
+
+    function usePhotoMode() {
+      // 隱藏 LINE 提示，進入主畫面（拍照模式）
+      document.getElementById("line-screen").style.display = "none";
+      document.getElementById("main-screen").style.display = "flex";
+      document.getElementById("camera-wrapper").style.display = "none";
+      document.getElementById("photo-scan-btn").classList.add("show");
+      document.querySelector(".hint").textContent = "點擊按鈕，拍下 QR Code 即可掃描";
+    }
+
+    function triggerPhotoScan() {
+      document.getElementById("photo-input").value = ""; // 允許重複選同張圖
+      document.getElementById("photo-input").click();
+    }
+
+    function handlePhotoFile(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        canvas.width  = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0);
+        URL.revokeObjectURL(url);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const qr = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+        if (qr && qr.data) {
+          handleQRCode(qr.data);
+        } else {
+          showToast("無法從照片中識別 QR Code，請重新拍攝", "error");
+        }
+      };
+      img.src = url;
+    }
+
     // 驗證參數
     if (!SERVICE_TOKEN) {
       document.getElementById("error-screen").style.display = "flex";
+    } else if (isLineAndroid) {
+      document.getElementById("line-screen").style.display = "flex";
     } else {
       document.getElementById("main-screen").style.display = "flex";
       startCamera();
