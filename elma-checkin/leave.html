@@ -10,8 +10,8 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0f172a;
-      color: #f1f5f9;
+      background: #f0f4fb;
+      color: #1e2a5e;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
@@ -34,14 +34,26 @@
     }
     header h1 { font-size: 2rem; font-weight: 700; }
 
+    .school-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+    .school-brand img { width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; }
+    .school-brand-text { text-align: left; }
+    .school-brand-text .zh { font-size: 1.5rem; font-weight: 700; color: #1e2a5e; letter-spacing: 0.02em; }
+    .school-brand-text .en { font-size: 0.85rem; font-weight: 500; color: #3b6fd4; letter-spacing: 0.03em; margin-top: 1px; }
+
     /* ── 相機區塊 ── */
     #btn-camera {
       width: 100%;
       padding: 0.75rem 1.25rem;
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: #ffffff;
+      border: 1px solid #d0d8ea;
       border-radius: 0.75rem;
-      color: #94a3b8;
+      color: #6b7a9b;
       font-size: 1rem;
       cursor: pointer;
       display: flex;
@@ -50,8 +62,8 @@
       gap: 0.5rem;
       transition: background 0.2s, color 0.2s;
     }
-    #btn-camera:hover { background: #263549; color: #e2e8f0; }
-    #btn-camera.active { background: #0f2744; color: #7dd3fc; border-color: #38bdf8; }
+    #btn-camera:hover { background: #e8edf8; color: #1e2a5e; }
+    #btn-camera.active { background: #dbeafe; color: #2563eb; border-color: #3b6fd4; }
 
     .camera-wrapper {
       display: none;
@@ -61,7 +73,7 @@
       background: #1e293b;
       border-radius: 1rem;
       overflow: hidden;
-      border: 2px solid #334155;
+      border: 2px solid #d0d8ea;
     }
     .camera-wrapper.open { display: block; }
 
@@ -93,7 +105,7 @@
       position: absolute;
       width: 20px;
       height: 20px;
-      border-color: #38bdf8;
+      border-color: #3b6fd4;
       border-style: solid;
     }
     .scan-frame::before        { top: 0;    left: 0;  border-width: 3px 0 0 3px; }
@@ -105,7 +117,7 @@
       position: absolute;
       left: 5%; right: 5%;
       height: 2px;
-      background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+      background: linear-gradient(90deg, transparent, #3b6fd4, transparent);
       animation: scan 2s ease-in-out infinite;
       top: 10%;
     }
@@ -128,9 +140,10 @@
     /* ── 表單 ── */
     .form-card {
       width: 100%;
-      background: #1e293b;
-      border: 1px solid #334155;
+      background: #ffffff;
+      border: 1px solid #d0d8ea;
       border-radius: 1rem;
+      box-shadow: 0 2px 12px rgba(30,42,94,0.08);
       padding: 1.25rem;
       display: flex;
       flex-direction: column;
@@ -144,15 +157,15 @@
     }
     .field label {
       font-size: 0.875rem;
-      color: #94a3b8;
+      color: #6b7a9b;
       font-weight: 500;
     }
     .field input[type="text"],
     .field textarea {
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: #ffffff;
+      border: 1px solid #d0d8ea;
       border-radius: 0.5rem;
-      color: #f1f5f9;
+      color: #1e2a5e;
       font-size: 1rem;
       padding: 0.65rem 0.875rem;
       outline: none;
@@ -161,7 +174,7 @@
       font-family: inherit;
     }
     .field input[type="text"]:focus,
-    .field textarea:focus { border-color: #38bdf8; }
+    .field textarea:focus { border-color: #3b6fd4; }
     .field input.error,
     .field textarea.error { border-color: #ef4444; }
     .field textarea { resize: vertical; min-height: 80px; }
@@ -176,10 +189,10 @@
       width: 2.5rem;
       height: 2.75rem;
       flex-shrink: 0;
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: #ffffff;
+      border: 1px solid #d0d8ea;
       border-radius: 0.5rem;
-      color: #94a3b8;
+      color: #6b7a9b;
       font-size: 1.25rem;
       cursor: pointer;
       display: flex;
@@ -187,13 +200,13 @@
       justify-content: center;
       transition: background 0.15s, color 0.15s;
     }
-    .date-nav-btn:hover { background: #1e293b; color: #f1f5f9; }
+    .date-nav-btn:hover { background: #e8edf8; color: #1e2a5e; }
     .date-display {
       flex: 1;
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: #ffffff;
+      border: 1px solid #d0d8ea;
       border-radius: 0.5rem;
-      color: #f1f5f9;
+      color: #1e2a5e;
       font-size: 1rem;
       padding: 0.65rem 0.875rem;
       cursor: pointer;
@@ -203,7 +216,7 @@
       user-select: none;
       transition: border-color 0.15s;
     }
-    .date-display:hover { border-color: #475569; }
+    .date-display:hover { border-color: #a0b0c8; }
     .date-display.error { border-color: #ef4444; }
     .date-display .icon { opacity: 0.4; font-size: 0.9rem; }
     .date-shortcuts {
@@ -213,30 +226,30 @@
     .date-shortcuts button {
       flex: 1;
       padding: 0.4rem 0;
-      background: #0f172a;
-      border: 1px solid #334155;
+      background: #ffffff;
+      border: 1px solid #d0d8ea;
       border-radius: 0.4rem;
-      color: #64748b;
+      color: #8492b0;
       font-size: 0.85rem;
       cursor: pointer;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
-    .date-shortcuts button:hover { background: #1e293b; color: #e2e8f0; }
+    .date-shortcuts button:hover { background: #e8edf8; color: #1e2a5e; }
     .date-shortcuts button.active {
-      background: #0f2744;
-      color: #7dd3fc;
-      border-color: #38bdf8;
+      background: #dbeafe;
+      color: #2563eb;
+      border-color: #3b6fd4;
     }
 
     /* 掃描後顯示的姓名提示 */
     #scanned-name {
       display: none;
       font-size: 0.875rem;
-      color: #7dd3fc;
+      color: #2563eb;
       padding: 0.4rem 0.875rem;
-      background: #0f2744;
+      background: #dbeafe;
       border-radius: 0.4rem;
-      border: 1px solid #38bdf8;
+      border: 1px solid #3b6fd4;
     }
     #scanned-name.show { display: block; }
 
@@ -248,29 +261,29 @@
     .yn-toggle button {
       flex: 1;
       padding: 0.55rem 0;
-      border: 1px solid #334155;
+      border: 1px solid #d0d8ea;
       border-radius: 0.5rem;
-      background: #0f172a;
-      color: #64748b;
+      background: #ffffff;
+      color: #8492b0;
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
     .yn-toggle button.selected-yes {
-      background: #14532d;
-      color: #bbf7d0;
+      background: #dcfce7;
+      color: #166534;
       border-color: #22c55e;
     }
     .yn-toggle button.selected-no {
-      background: #450a0a;
-      color: #fecaca;
+      background: #fee2e2;
+      color: #991b1b;
       border-color: #ef4444;
     }
 
     .field-note {
       font-size: 0.8rem;
-      color: #475569;
+      color: #9aabc5;
     }
 
     .error-msg {
@@ -283,8 +296,8 @@
     #btn-submit {
       width: 100%;
       padding: 0.85rem;
-      background: #166534;
-      color: #bbf7d0;
+      background: #16a34a;
+      color: #ffffff;
       border: none;
       border-radius: 0.75rem;
       font-size: 1.05rem;
@@ -293,7 +306,7 @@
       transition: background 0.2s;
     }
     #btn-submit:hover { background: #15803d; }
-    #btn-submit:active { background: #14532d; }
+    #btn-submit:active { background: #166534; }
 
     /* ── Toast ── */
     #toast {
@@ -315,7 +328,7 @@
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     #toast.success { background: #166534; color: #bbf7d0; border: 1px solid #22c55e; }
     #toast.error   { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
-    #toast.info    { background: #1e3a5f; color: #bae6fd; border: 1px solid #38bdf8; }
+    #toast.info    { background: #dbeafe; color: #1e40af; border: 1px solid #3b6fd4; }
 
     #submit-frame { display: none; }
 
@@ -328,22 +341,29 @@
     #camera-select-wrapper.show { display: flex; }
     #camera-select {
       flex: 1;
-      background: #1e293b;
-      color: #e2e8f0;
-      border: 1px solid #334155;
+      background: #ffffff;
+      color: #1e2a5e;
+      border: 1px solid #d0d8ea;
       border-radius: 0.5rem;
       padding: 0.5rem 0.75rem;
       font-size: 0.95rem;
       cursor: pointer;
       outline: none;
     }
-    #camera-select:focus { border-color: #38bdf8; }
+    #camera-select:focus { border-color: #3b6fd4; }
   </style>
 </head>
 <body>
 
   <div id="main-screen">
     <header>
+      <div class="school-brand">
+        <img src="imgs/icon.avif" alt="卓越領袖神學院" />
+        <div class="school-brand-text">
+          <div class="zh">卓越領袖神學院</div>
+          <div class="en">TopLeadership Bible School</div>
+        </div>
+      </div>
       <h1>📝 請假申請</h1>
     </header>
 

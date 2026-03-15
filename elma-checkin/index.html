@@ -10,8 +10,8 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #0f172a;
-      color: #f1f5f9;
+      background: #f0f4fb;
+      color: #1e2a5e;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
@@ -30,7 +30,7 @@
     }
     #error-screen .icon { font-size: 3rem; }
     #error-screen h2 { color: #f87171; font-size: 1.4rem; }
-    #error-screen p { color: #94a3b8; font-size: 0.9rem; line-height: 1.6; }
+    #error-screen p { color: #6b7a9b; font-size: 0.9rem; line-height: 1.6; }
 
     #main-screen {
       display: none;
@@ -45,10 +45,22 @@
     header { text-align: center; }
     header h1 { font-size: 2rem; font-weight: 700; }
 
+    .school-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+    .school-brand img { width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; }
+    .school-brand-text { text-align: left; }
+    .school-brand-text .zh { font-size: 1.5rem; font-weight: 700; color: #1e2a5e; letter-spacing: 0.02em; }
+    .school-brand-text .en { font-size: 0.85rem; font-weight: 500; color: #3b6fd4; letter-spacing: 0.03em; margin-top: 1px; }
+
     .type-toggle {
       display: flex;
       margin-top: 0.6rem;
-      background: #1e293b;
+      background: #e8edf8;
       border-radius: 99px;
       padding: 4px;
       gap: 3px;
@@ -62,11 +74,11 @@
       font-weight: 600;
       cursor: pointer;
       background: transparent;
-      color: #64748b;
+      color: #8492b0;
       transition: background 0.2s, color 0.2s;
     }
-    .type-toggle button.active-checkin  { background: #166534; color: #bbf7d0; }
-    .type-toggle button.active-checkout { background: #7c2d12; color: #fed7aa; }
+    .type-toggle button.active-checkin  { background: #dcfce7; color: #166534; }
+    .type-toggle button.active-checkout { background: #ffedd5; color: #9a3412; }
 
     .camera-wrapper {
       position: relative;
@@ -75,7 +87,7 @@
       background: #1e293b;
       border-radius: 1rem;
       overflow: hidden;
-      border: 2px solid #334155;
+      border: 2px solid #d0d8ea;
     }
 
     #camera-video {
@@ -106,7 +118,7 @@
       position: absolute;
       width: 20px;
       height: 20px;
-      border-color: #38bdf8;
+      border-color: #3b6fd4;
       border-style: solid;
     }
     .scan-frame::before        { top: 0;    left: 0;  border-width: 3px 0 0 3px; }
@@ -118,7 +130,7 @@
       position: absolute;
       left: 5%; right: 5%;
       height: 2px;
-      background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+      background: linear-gradient(90deg, transparent, #3b6fd4, transparent);
       animation: scan 2s ease-in-out infinite;
       top: 10%;
     }
@@ -140,7 +152,7 @@
 
     .hint {
       font-size: 1rem;
-      color: #64748b;
+      color: #6b7a9b;
       text-align: center;
     }
 
@@ -156,7 +168,7 @@
       content: "尚無掃描記錄";
       display: block;
       text-align: center;
-      color: #475569;
+      color: #9aabc5;
       font-size: 0.85rem;
       padding: 1rem 0;
     }
@@ -164,9 +176,10 @@
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      background: #1e293b;
+      background: #ffffff;
       border-radius: 0.6rem;
       padding: 0.7rem 1rem;
+      box-shadow: 0 1px 4px rgba(30,42,94,0.08);
       font-size: 1rem;
       border-left: 3px solid #22c55e;
       animation: slideIn 0.3s ease-out;
@@ -177,9 +190,9 @@
       from { opacity: 0; transform: translateY(-8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    .log-item .name { font-weight: 600; color: #e2e8f0; flex: 1; }
-    .log-item .tag  { font-size: 0.85rem; color: #94a3b8; background: #0f172a; border-radius: 4px; padding: 2px 7px; }
-    .log-item .time { color: #64748b; font-size: 0.9rem; white-space: nowrap; }
+    .log-item .name { font-weight: 600; color: #1e2a5e; flex: 1; }
+    .log-item .tag  { font-size: 0.85rem; color: #6b7a9b; background: #eef2fb; border-radius: 4px; padding: 2px 7px; }
+    .log-item .time { color: #8492b0; font-size: 0.9rem; white-space: nowrap; }
 
     #toast {
       position: fixed;
@@ -200,7 +213,7 @@
     #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     #toast.success { background: #166534; color: #bbf7d0; border: 1px solid #22c55e; }
     #toast.error   { background: #7f1d1d; color: #fecaca; border: 1px solid #ef4444; }
-    #toast.info    { background: #1e3a5f; color: #bae6fd; border: 1px solid #38bdf8; }
+    #toast.info    { background: #dbeafe; color: #1e40af; border: 1px solid #3b6fd4; }
 
     #submit-frame { display: none; }
 
@@ -213,16 +226,16 @@
     #camera-select-wrapper.show { display: flex; }
     #camera-select {
       flex: 1;
-      background: #1e293b;
-      color: #e2e8f0;
-      border: 1px solid #334155;
+      background: #ffffff;
+      color: #1e2a5e;
+      border: 1px solid #d0d8ea;
       border-radius: 0.5rem;
       padding: 0.5rem 0.75rem;
       font-size: 0.95rem;
       cursor: pointer;
       outline: none;
     }
-    #camera-select:focus { border-color: #38bdf8; }
+    #camera-select:focus { border-color: #3b6fd4; }
   </style>
 </head>
 <body>
@@ -239,6 +252,13 @@
   <!-- Main screen -->
   <div id="main-screen">
     <header>
+      <div class="school-brand">
+        <img src="imgs/icon.avif" alt="卓越領袖神學院" />
+        <div class="school-brand-text">
+          <div class="zh">卓越領袖神學院</div>
+          <div class="en">TopLeadership Bible School</div>
+        </div>
+      </div>
       <h1>📋 點名系統</h1>
       <div class="type-toggle">
         <button id="btn-checkin"  onclick="setType('簽到')"  class="active-checkin">簽到</button>
