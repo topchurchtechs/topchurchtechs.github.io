@@ -1,2 +1,29 @@
+# Editor
 .vscode/
+.idea/
+
+# Environment
 .env
+.env.local
+.env.*.local
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log
+
+# Jekyll (GitHub Pages)
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+Gemfile.lock

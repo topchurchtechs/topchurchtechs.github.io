@@ -30,15 +30,15 @@ function handleCheckin(body) {
   if (serviceToken !== CONFIG.serviceToken) {
     return respond(false, "無效的 serviceToken");
   }
-  if (!id || !type) {
-    return respond(false, "缺少必要欄位（id, type）");
+  if (!id) {
+    return respond(false, "缺少必要欄位（id）");
   }
 
   const now  = new Date();
   const date = Utilities.formatDate(now, "Asia/Taipei", "yyyy-MM-dd");
 
   const sheet = getOrCreateSheet(CONFIG.sheets.checkin, ["時間", "ID", "類型", "日期"]);
-  sheet.appendRow([now, id, type, date]);
+  sheet.appendRow([now, id, type ?? "", date]);
 
   return respond(true);
 }
