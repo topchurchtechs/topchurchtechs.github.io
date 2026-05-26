@@ -277,6 +277,33 @@
       border-color: #b88080;
     }
 
+    /* 起迌時間 */
+    .time-range-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .time-range-row input[type="time"] {
+      flex: 1;
+      background: #ffffff;
+      border: 1px solid #d0d8ea;
+      border-radius: 0.5rem;
+      color: #1e2a5e;
+      font-size: 1rem;
+      padding: 0.65rem 0.875rem;
+      outline: none;
+      transition: border-color 0.15s;
+      font-family: inherit;
+    }
+    .time-range-row input[type="time"]:focus { border-color: #3b6fd4; }
+    .time-range-row input[type="time"].error { border-color: #ef4444; }
+    .time-range-sep {
+      color: #9aabc5;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
     .field-note {
       font-size: 0.8rem;
       color: #9aabc5;
@@ -406,6 +433,16 @@
       </div>
 
       <div class="field">
+        <label>請假時段（選填）</label>
+        <div class="time-range-row">
+          <input type="time" id="input-time-start" />
+          <span class="time-range-sep">–</span>
+          <input type="time" id="input-time-end" />
+        </div>
+        <span class="error-msg" id="err-time">請假時段格式不正確</span>
+      </div>
+
+      <div class="field">
         <label for="input-reason">請假原因</label>
         <textarea id="input-reason" placeholder="請簡述請假原因"></textarea>
         <span class="error-msg" id="err-reason">請填寫請假原因</span>
@@ -499,7 +536,7 @@
     // 預設今天
     setDate(getToday());
 
-    // 是/否 選擇狀態
+    // ─── 是/否 選擇狀態
     const yn = { mentor: null, supervisor: null };
 
     function selectYN(group, value) {
@@ -709,6 +746,29 @@
         document.getElementById("err-date").classList.remove("show");
       }
 
+      const timeStartEl = document.getElementById("input-time-start");
+      const timeEndEl   = document.getElementById("input-time-end");
+      const hasStart    = Boolean(timeStartEl.value);
+      const hasEnd      = Boolean(timeEndEl.value);
+
+      if (hasStart !== hasEnd) {
+        timeStartEl.classList.toggle("error", !hasStart);
+        timeEndEl.classList.toggle("error",   !hasEnd);
+        document.getElementById("err-time").textContent = "若要填寫請假時段，請同時填開始與結束時間";
+        document.getElementById("err-time").classList.add("show");
+        valid = false;
+      } else if (hasStart && hasEnd && timeEndEl.value <= timeStartEl.value) {
+        timeEndEl.classList.add("error");
+        document.getElementById("err-time").textContent = "結束時間必須在開始時間之後";
+        document.getElementById("err-time").classList.add("show");
+        valid = false;
+      } else {
+        timeStartEl.classList.remove("error");
+        timeEndEl.classList.remove("error");
+        document.getElementById("err-time").textContent = "請假時段格式不正確";
+        document.getElementById("err-time").classList.remove("show");
+      }
+
       if (!reasonEl.value.trim()) {
         reasonEl.classList.add("error");
         document.getElementById("err-reason").classList.add("show");
@@ -736,6 +796,7 @@
           action:     "leave",
           id:         idEl.value.trim(),
           date:       dateEl.value,
+          periods:    hasStart && hasEnd ? `${timeStartEl.value}–${timeEndEl.value}` : "",
           reason:     reasonEl.value.trim(),
           mentor:     yn.mentor,
           supervisor: yn.supervisor,
@@ -749,6 +810,9 @@
           setDate(getToday());
           reasonEl.value = "";
           document.getElementById("scanned-name").classList.remove("show");
+          // 清除時段
+          document.getElementById("input-time-start").value = "";
+          document.getElementById("input-time-end").value   = "";
           resetYN("mentor");
           resetYN("supervisor");
         })

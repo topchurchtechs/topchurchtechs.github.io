@@ -45,14 +45,14 @@ function handleCheckin(body) {
 
 // ─── 請假 ──────────────────────────────────────────────────────────────────
 function handleLeave(body) {
-  const { id, date, reason, mentor, supervisor } = body;
+  const { id, date, periods, reason, mentor, supervisor } = body;
 
   if (!id || !date || !reason || !mentor) {
     return respond(false, "缺少必要欄位（id, date, reason, mentor）");
   }
 
-  const sheet = getOrCreateSheet(CONFIG.sheets.leave, ["送出時間", "請假日期", "ID", "請假原因", "已知會導師", "已知會主管"]);
-  sheet.appendRow([new Date(), date, id, reason, mentor ?? "", supervisor ?? ""]);
+  const sheet = getOrCreateSheet(CONFIG.sheets.leave, ["送出時間", "請假日期", "ID", "請假時段", "請假原因", "已知會導師", "已知會主管"]);
+  sheet.appendRow([new Date(), date, id, periods ?? "", reason, mentor ?? "", supervisor ?? ""]);
 
   return respond(true);
 }
